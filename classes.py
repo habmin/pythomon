@@ -36,6 +36,10 @@ class Grid:
     def __init__(self):
         pass
 
+class Item:
+    def __init__(self, name):
+        self.name
+
 store = [
     {"Health Spray": 20},
     {"Health Drink": 50},
