@@ -1,7 +1,8 @@
 class Player:
-    def __init__(self, name, gender):
+    def __init__(self, name = "Ashy", gender = "Male"):
         self.name = name
         self.money = 100
+        self.pythomon = []
         # make this have items
         self.bag = []
         self.gender = gender
@@ -17,6 +18,7 @@ class Pythomon:
         self.gender = gender
         self.nature = nature
         self.moves = moves
+        self.status = "alive"
 
 class Trainer:
     def __init__(self, name, pythomon, money, prize, about, flair):
@@ -40,8 +42,10 @@ class Item:
     def __init__(self, name):
         self.name
 
-store = [
-    {"Health Spray": 20},
-    {"Health Drink": 50},
-    {"Capture Ball": 50}
-]
+class Store:
+    def __init__(self):
+        self.items = [
+            {"Health Spray": 20},
+            {"Health Drink": 50},
+            {"Capture Ball": 50}
+        ]

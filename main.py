@@ -1,4 +1,6 @@
 import curses
+import time
+from classes import *
 
 def start_screen(stdscr, h, w):
     title = ["  _ \ \ \   / __ __|  |   |   _ \    \  |   _ \    \  |  |",
@@ -6,37 +8,111 @@ def start_screen(stdscr, h, w):
              " ___/     |      |    ___ |  |   |  |   |  |   |  |\  | _|",
              "_|       _|     _|   _|  _| \___/  _|  _| \___/  _| \_| _)"]
     subtitle = "Pythomon! - A Python Battle Game!"
-    directions = "Press 'Enter' to begin, or 'q' to exit."
+    directions = "Use arrow keys to select"
 
+    # Menu selection variables
+    menu = ["Start a New Game", "Quit"]
+    selection = 0
     keypress = 0
-    while (keypress != curses.KEY_ENTER or keypress != 10):
+
+    while True:
         stdscr.clear()
-        if keypress == ord('q'):
-            exit(0)
-        elif keypress == curses.KEY_ENTER or keypress in [10, 13]:
-            break
+
+        # Title Banner
         for i, line in enumerate(title):
             stdscr.attron(curses.color_pair(2))
             stdscr.addstr((h // 2) - (10 - i), ((w // 2) - (len(line) // 2)), line)
             stdscr.attroff(curses.color_pair(2))
         stdscr.addstr((h // 2) - 6, ((w // 2) - (len(subtitle) // 2)), subtitle)
-        stdscr.addstr((h // 2) + 3, ((w // 2) - (len(directions) // 2)), directions, curses.A_REVERSE)
-        stdscr.refresh()
+        stdscr.addstr((h // 2) + 3, ((w // 2) - (len(directions) // 2)), directions)
+        
+        # Menu Selection
+        for i, option in enumerate(menu):
+            if i == selection:
+                stdscr.attron(curses.color_pair(1))
+                stdscr.addstr((h // 2) + i, ((w // 2) - (len(option) // 2)), option)
+                stdscr.attroff(curses.color_pair(1))
+            else:
+                stdscr.addstr((h // 2) + i, ((w // 2) - (len(option) // 2)), option)
+
+        # Keyboard listeners
         keypress = stdscr.getch()
+        if keypress == curses.KEY_UP and selection > 0:
+            selection -= 1
+        elif keypress == curses.KEY_DOWN and selection < (len(menu) - 1):
+            selection += 1
+        elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Start a New Game":
+            break
+        elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Quit":
+            exit(0)
+        
+        stdscr.refresh()
+
     return
 
+def create_player(stdscr, h, w):
+    title = "Enter your trainer's name and gender"
+    player = Player()
+    player_name_buffer = ""
+    player_gender_buffer = ""
 
-def menu_display(stdscr, menu, selected, h, w):
-    stdscr.clear()
-    for i, option in enumerate(menu):
-        if i == selected:
-            stdscr.attron(curses.color_pair(1))
-            stdscr.addstr((h // 2) + i, ((w // 2) - (len(option) // 2)), option)
-            stdscr.attroff(curses.color_pair(1))
+    # Menu selection variables
+    menu = ["Player's Name", "Player's Gender", "Finish"]
+    selection = 0
+    keypress = 0
+    while True:
+        curses.curs_set(1)
+        stdscr.clear()
+
+        # Title Banner
+        stdscr.addstr(8, ((w // 2) - (len(title) // 2)), title)
+        
+        # Menu Selection
+        for i, option in enumerate(menu):
+            if i == selection:
+                stdscr.attron(curses.color_pair(1))
+                stdscr.addstr(12 + i, ((w // 2) - 30), option)
+                stdscr.attroff(curses.color_pair(1))
+            else:
+                stdscr.addstr(12 + i, ((w // 2) - 30), option)
+        
+        # Player input display
+        stdscr.addstr(12, ((w // 2) - 14), player_name_buffer)
+        stdscr.addstr(13, ((w // 2) - 14), player_gender_buffer)
+        
+        # Cursor location
+        if menu[selection] == "Player's Name":
+            stdscr.move(12, ((w // 2) - 14 + len(player_name_buffer)))
+        elif menu[selection] == "Player's Gender":
+            stdscr.move(13, ((w // 2) - 14 + len(player_gender_buffer)))
         else:
-            stdscr.addstr((h // 2) + i, ((w // 2) - (len(option) // 2)), option)
-    stdscr.refresh()
-    return
+            curses.curs_set(0)
+
+        # Keyboard listeners
+        keypress = stdscr.getch()
+        if keypress == curses.KEY_UP and selection > 0:
+            selection -= 1
+        elif keypress == curses.KEY_DOWN and selection < (len(menu) - 1):
+            selection += 1
+        elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Finish":
+            player.name = player_name_buffer
+            player.gender = player_gender_buffer
+            return player
+        
+        # Input handlers
+        elif menu[selection] == "Player's Name":
+            if keypress >= 32 and keypress <= 126 and len(player_name_buffer) <= 15:
+                player_name_buffer += chr(keypress)
+            elif keypress in [8, 127] and len(player_name_buffer) != 0:
+                player_name_buffer = player_name_buffer[:-1]
+        elif menu[selection] == "Player's Gender":
+            if keypress >= 32 and keypress <= 126 and len(player_gender_buffer) <= 15:
+                player_gender_buffer += chr(keypress)
+            elif keypress in [8, 127] and len(player_gender_buffer) != 0:
+                player_gender_buffer = player_gender_buffer[:-1]
+
+        stdscr.refresh()
+    return player
 
 def main(stdscr):
     # --- curses initializers ---
@@ -51,21 +127,8 @@ def main(stdscr):
     # Start Splash Screen
     start_screen(stdscr, height, width)
 
-    # Menu Selection Screen
-    selection = 0
-    menu = ["Option 1", "Option 2", "Option 3", "Quit"]
-    keypress = 0
-    menu_display(stdscr, menu, selection, height, width)
-    while True:
-        keypress = stdscr.getch()
-        if keypress == curses.KEY_UP and selection > 0:
-            selection -= 1
-        elif keypress == curses.KEY_DOWN and selection < (len(menu) - 1):
-            selection += 1
-        elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Quit":
-            break
-        menu_display(stdscr, menu, selection, height, width)
-        stdscr.refresh()
+    # Create Player
+    player = create_player(stdscr, height, width)
 
     # Done with program, reset curs_set and end
     curses.curs_set(1)
@@ -74,4 +137,22 @@ def main(stdscr):
 
 if __name__ == "__main__":
     curses.wrapper(main)
+
+
+
+
+
+
+
+
+
+    # print("░░░░░▄▄▀▀▀▀▀▀▀▀▀▄▄░░░░░")
+    # print("░░░░█░░░░░░░░░░░░░█░░░░")
+    # print("░░░█░░░░░░░░░░▄▄▄░░█░░░")
+    # print("░░░█░░▄▄▄░░▄░░███░░█░░░")
+    # print("░░░▄█░▄░░░▀▀▀░░░▄░█▄░░░")
+    # print("░░░█░░▀█▀█▀█▀█▀█▀░░█░░░")
+    # print("░░░▄██▄▄▀▀▀▀▀▀▀▄▄██▄░░░")
+    # print("░▄█░█▀▀█▀▀▀█▀▀▀█▀▀█░█▄░")
+
                                                             
