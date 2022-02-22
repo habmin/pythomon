@@ -1,5 +1,7 @@
+from assets import traits
+
 class Player:
-    def __init__(self, name = "Ashy", gender = "Male"):
+    def __init__(self, name = "Ashy", gender = "Male", nature = traits[0]):
         self.name = name
         self.money = 100
         self.pythomon = []
@@ -8,16 +10,19 @@ class Player:
         self.gender = gender
         # should this be a choice, or just whatever text they want
         # kind mean funny etc was in his notes
-        self.nature = []
+        self.nature = nature
 
 class Pythomon:
-    def __init__(self, name, hp, base_atk, gender, nature, moves):
+    def __init__(self, name, hp, base_atk, gender, nature, moves, exp_prize = 10):
         self.name = name
         self.hp = hp
         self.base_atk = base_atk
         self.gender = gender
         self.nature = nature
         self.moves = moves
+        self.exp = 0
+        self.exp_prize = exp_prize
+        self.money_prize = 15
         self.status = "alive"
 
 class Trainer:
@@ -45,7 +50,10 @@ class Item:
 class Store:
     def __init__(self):
         self.items = [
-            {"Health Spray": 20},
-            {"Health Drink": 50},
-            {"Capture Ball": 50}
+            {"name": "Health Spray",
+             "price": 20},
+            {"name": "Health Drink",
+             "price": 50},
+            {"name": "Capture Ball",
+             "price": 50}
         ]
