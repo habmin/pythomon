@@ -112,7 +112,7 @@ def create_player(stdscr, h, w):
         elif keypress == curses.KEY_DOWN and selection < (len(menu) - 1):
             selection += 1
         elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Finish":
-            return Player(player_name_buffer, player_gender_buffer, player_trait_buffer)
+            return Player(Pythomon(pythodeck[starter_selection]),player_name_buffer, player_gender_buffer, player_trait_buffer)
         
         # Input handlers
         elif menu[selection] == "Trainer's Name":

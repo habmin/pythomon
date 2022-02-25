@@ -1,29 +1,26 @@
-from xmlrpc.client import Boolean
+import random
 from assets import traits
 
 class Player:
-    def __init__(self, name = "Ashy", gender = "Male", nature = traits[0]):
+    def __init__(self, starter, name = "Ashy", gender = "Male", nature = traits[0]):
         self.name = name
         self.money = 100
-        self.pythomon = []
-        # make this have items
-        self.bag = []
+        self.pythomon = [starter]
+        self.bag = ["Health Spray", "Health Spray", "Capture Ball", "Capture Ball", "Capture Ball"]
         self.gender = gender
-        # should this be a choice, or just whatever text they want
-        # kind mean funny etc was in his notes
         self.nature = nature
 
 class Pythomon:
-    def __init__(self, name, max_hp, base_atk, gender, nature, moves, exp_prize = 10):
-        self.name = name
-        self.max_hp = max_hp
-        self.hp = max_hp
-        self.base_atk = base_atk
-        self.gender = gender
-        self.nature = nature
-        self.moves = moves
+    def __init__(self, pythodeck):
+        self.name = pythodeck["name"]
+        self.max_hp = pythodeck["hp"]
+        self.hp = pythodeck["hp"]
+        self.base_atk = pythodeck["base_atk"]
+        self.gender = pythodeck["base_atk"]
+        self.nature = traits[randint(0, len(traits))]
+        self.moves = pythodeck["moves"]
         self.exp = 0
-        self.exp_prize = exp_prize
+        self.exp_prize = pythodeck["exp_prize"]
         self.money_prize = 15
         self.status = "alive"
 
@@ -61,5 +58,7 @@ class Store:
             {"name": "Health Drink",
              "price": 50},
             {"name": "Capture Ball",
-             "price": 50}
+             "price": 50},
+            {"name": "Revive",
+             "price": 100}
         ]
