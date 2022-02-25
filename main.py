@@ -50,14 +50,38 @@ def main(stdscr):
     player = create_player(stdscr, height, width)
 
     # Create grid
-    grid = grid_maker(10, 10, 3)
+    grid_height = 10
+    grid_width = 10
+    encounter_rate = 3
+    grid = grid_maker(grid_height, grid_width, encounter_rate)
 
     # Loop until player is defeated or wins
     # while not player.defeated:
     #     # print grid
-    print_grid(stdscr, height, width, player, grid)
-    sleep(10)
-
+    player_x = 0
+    player_y = 0
+    keypress = 0
+    while True:
+        stdscr.clear()
+        print_grid(stdscr, height, width, player, grid)
+        keypress = stdscr.getch()
+        if keypress == curses.KEY_LEFT and not player_x == 0:
+            grid[player_y][player_x].player_occupied = False
+            player_x -= 1
+            grid[player_y][player_x].player_occupied = True
+        elif keypress == curses.KEY_RIGHT and not player_x == grid_width - 1:
+            grid[player_y][player_x].player_occupied = False
+            player_x += 1
+            grid[player_y][player_x].player_occupied = True
+        elif keypress == curses.KEY_UP and not player_y == 0:
+            grid[player_y][player_x].player_occupied = False
+            player_y -= 1
+            grid[player_y][player_x].player_occupied = True
+        elif keypress == curses.KEY_DOWN and not player_y == grid_height - 1:
+            grid[player_y][player_x].player_occupied = False
+            player_y += 1
+            grid[player_y][player_x].player_occupied = True    
+        stdscr.refresh()
     # Done with program, reset curs_set and end
     curses.curs_set(1)
     curses.endwin()
