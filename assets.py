@@ -133,12 +133,12 @@ pythodeck = [
             "power": 10},
         "exp_prize": 25},
     {
-        "name": "Oh Mah Star", 
+        "name": "Mar Veep", 
         "hp": 40, 
         "base_atk": 7, 
-        "gender": "Big eyes",
+        "gender": "Hard Yet Soft",
         "moves": {
-            "name": "Fossilize",
+            "name": "Wool Choke",
             "power": 10},
         "exp_prize": 25},
     {
