@@ -24,6 +24,17 @@ class Pythomon:
         self.exp_prize = pythodeck["exp_prize"]
         self.money_prize = 15
         self.status = "alive"
+        self.art = pythodeck["art"]
+    
+    def level_up(self, exp):
+        self.exp += exp
+        if exp >= 100:
+            self.max_hp += 3
+            self.base_atk += 3
+            self.hp = self.max_hp
+            return True
+        return False
+        
 
 class Trainer:
     def __init__(self, name, pythomon, money, prize, about, flair):

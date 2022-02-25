@@ -1,6 +1,6 @@
 import curses
 import random
-from time import sleep
+import time
 from classes import *
 from screens import *
 
@@ -52,7 +52,7 @@ def main(stdscr):
     # Create grid
     grid_height = 10
     grid_width = 10
-    encounter_rate = 3
+    encounter_rate = 10
     grid = grid_maker(grid_height, grid_width, encounter_rate)
 
     # Loop until player is defeated or wins
@@ -60,10 +60,11 @@ def main(stdscr):
     #     # print grid
     player_x = 0
     player_y = 0
-    keypress = 0
     while True:
         stdscr.clear()
-        print_grid(stdscr, height, width, player, grid)
+        if grid[player_y][player_x].terrain == "encounter":
+            encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]))
+        print_grid(stdscr, height, width, grid)
         keypress = stdscr.getch()
         if keypress == curses.KEY_LEFT and not player_x == 0:
             grid[player_y][player_x].player_occupied = False

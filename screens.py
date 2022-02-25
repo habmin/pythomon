@@ -137,23 +137,34 @@ def create_player(stdscr, h, w):
                 starter_selection = (starter_selection + 1) % 4
         stdscr.refresh()
 
-def print_grid(stdscr, h, w, player, grid):
+def print_grid(stdscr, h, w, grid):
     line = "═" * (3 * len(grid[0]))
-    stdscr.clear()
     stdscr.addstr(1, 1, f"╔{line}╗")
     for i, row in enumerate(grid):
         stdscr.addstr(2 + i, 1, "║")
         for j, cell in enumerate(row):
+            fill = "▒"
+            if i % 2 == 0:
+                fill = "░"
             if cell.player_occupied:
-                stdscr.addstr(2 + i, 2 + (3 * j), "░Y░")
+                stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}Y{fill}")
             elif cell.terrain == "trainer":
-                stdscr.addstr(2 + i, 2 + (3 * j), "░T░")
+                stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}T{fill}")
             elif cell.terrain == "encounter":
-                stdscr.addstr(2 + i, 2 + (3 * j), "░E░")
+                stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}E{fill}")
             elif cell.terrain == "store":
-                stdscr.addstr(2 + i, 2 + (3 * j), "░$░")
+                stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}${fill}")
             else:
-                stdscr.addstr(2 + i, 2 + (3 * j), "░░░")
+                if fill == "▒":
+                    stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}░{fill}")
+                else:
+                    stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}▒{fill}")
         stdscr.addstr(2 + i, 2 + (3 * (j + 1)), "║")
     stdscr.addstr(len(grid) + 2, 1, f"╚{line}╝")
+
+def encounter(stdscr, h, w, player, pythomon_target):
+    stdscr.clear()
+    for i, line in enumerate(player.pythomon[0].art):
+        stdscr.addstr(i, 0, line)
     stdscr.refresh()
+    time.sleep(5)
