@@ -136,3 +136,24 @@ def create_player(stdscr, h, w):
             elif keypress == curses.KEY_RIGHT:
                 starter_selection = (starter_selection + 1) % 4
         stdscr.refresh()
+
+def print_grid(stdscr, h, w, player, grid):
+    line = "═" * (3 * len(grid[0]))
+    stdscr.clear()
+    stdscr.addstr(1, 1, f"╔{line}╗")
+    for i, row in enumerate(grid):
+        stdscr.addstr(2 + i, 1, "║")
+        for j, cell in enumerate(row):
+            if cell.player_occupied:
+                stdscr.addstr(2 + i, 2 + (3 * j), "░Y░")
+            elif cell.terrain == "trainer":
+                stdscr.addstr(2 + i, 2 + (3 * j), "░T░")
+            elif cell.terrain == "encounter":
+                stdscr.addstr(2 + i, 2 + (3 * j), "░E░")
+            elif cell.terrain == "store":
+                stdscr.addstr(2 + i, 2 + (3 * j), "░$░")
+            else:
+                stdscr.addstr(2 + i, 2 + (3 * j), "░░░")
+        stdscr.addstr(2 + i, 2 + (3 * (j + 1)), "║")
+    stdscr.addstr(len(grid) + 2, 1, f"╚{line}╝")
+    stdscr.refresh()

@@ -1,16 +1,19 @@
 import curses
 import random
-# import time
+from time import sleep
 from classes import *
 from screens import *
 
 def grid_maker(height, width, encounter_rate):
     # Create height by width grid and fill with Squares/Terrain
     grid = [[Square("grass") for i in range(height)] for j in range(width)]
+
     # Player always starts in upper left
     grid[0][0].player_occupied = True
+
     # Trainer is always in bottom right
     grid[height - 1][width - 1].terrain = "trainer"
+
     # Randomly place one store
     random_store_row = random.randint(0, height - 1)
     random_store_col = random.randint(0, width - 1)
@@ -19,6 +22,7 @@ def grid_maker(height, width, encounter_rate):
         random_store_row = random.randint(0, height - 1)
         random_store_col = random.randint(0, width - 1)
     grid[random_store_row][random_store_col].terrain = "store"
+
     # Make encounter_rate enemy encouter locations
     for i in range(encounter_rate):
         random_row = random.randint(0, height - 1)
@@ -46,7 +50,13 @@ def main(stdscr):
     player = create_player(stdscr, height, width)
 
     # Create grid
-    grid = grid_maker(5, 5, 3)
+    grid = grid_maker(10, 10, 3)
+
+    # Loop until player is defeated or wins
+    # while not player.defeated:
+    #     # print grid
+    print_grid(stdscr, height, width, player, grid)
+    sleep(10)
 
     # Done with program, reset curs_set and end
     curses.curs_set(1)

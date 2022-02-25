@@ -1,4 +1,4 @@
-import random
+from random import randint
 from assets import traits
 
 class Player:
@@ -9,6 +9,7 @@ class Player:
         self.bag = ["Health Spray", "Health Spray", "Capture Ball", "Capture Ball", "Capture Ball"]
         self.gender = gender
         self.nature = nature
+        self.defeated = False
 
 class Pythomon:
     def __init__(self, pythodeck):
@@ -17,7 +18,7 @@ class Pythomon:
         self.hp = pythodeck["hp"]
         self.base_atk = pythodeck["base_atk"]
         self.gender = pythodeck["base_atk"]
-        self.nature = traits[randint(0, len(traits))]
+        self.nature = traits[randint(0, len(traits) - 1)]
         self.moves = pythodeck["moves"]
         self.exp = 0
         self.exp_prize = pythodeck["exp_prize"]
