@@ -88,7 +88,8 @@ def create_player(stdscr, h, w):
         stdscr.addstr(10, ((w // 2) - 12), "HP: {}".format(str(pythodeck[starter_selection]["hp"])))
         stdscr.addstr(11, ((w // 2) - 12), "Base Attack: {}".format(str(pythodeck[starter_selection]["base_atk"])))
         stdscr.addstr(12, ((w // 2) - 12), "Gender: {}".format(str(pythodeck[starter_selection]["gender"])))
-        
+        for i, line in enumerate(pythodeck[starter_selection]["art"]):
+            stdscr.addstr(i + 13, ((w // 2) - 12), line)
         # Cursor location
         if menu[selection] == "Trainer's Name":
             stdscr.move(5, ((w // 2) - 12 + len(player_name_buffer)))
@@ -164,7 +165,44 @@ def print_grid(stdscr, h, w, grid):
 
 def encounter(stdscr, h, w, player, pythomon_target):
     stdscr.clear()
+    # 1. print encounter
+    for i, line in enumerate(pythomon_target.art):
+        stdscr.addstr(i + 3, 50, line[::-1])
+    stdscr.addstr(12, 50, pythomon_target.name)
+    stdscr.addstr(13, 50, f"{pythomon_target.nature} {pythomon_target.gender}")
+    encounter_hp_bar = "████████████████████"
+    stdscr.addstr(14, 50, f"HP: {encounter_hp_bar}")
+    init_menu = ["Fight", "Item", "Run"]
+    selection = 0
+    keypress = 0
+    while True:
+        for i, option in enumerate(init_menu):
+            if i == selection:
+                stdscr.attron(curses.color_pair(1))
+                stdscr.addstr((17) + i, 5, option)
+                stdscr.attroff(curses.color_pair(1))
+            else:
+                stdscr.addstr(17 + i, 5, option)
+        keypress = stdscr.getch()
+        if keypress == curses.KEY_UP and selection > 0:
+            selection -= 1
+        elif keypress == curses.KEY_DOWN and selection < (len(init_menu) - 1):
+            selection += 1
+        elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[selection] == "Fight":
+            break
+    # 2. menu
+        # fight
+            # choose pokemon
+        # item
+        # run
+    # 3. battle
+        # if win, capture
+        # if lose, go to next pythomon or game over
     for i, line in enumerate(player.pythomon[0].art):
-        stdscr.addstr(i, 0, line)
+        stdscr.addstr(i + 3, 5, line)
+    stdscr.addstr(12, 5, player.pythomon[0].name)
+    stdscr.addstr(13, 5, f"{player.pythomon[0].nature} {player.pythomon[0].gender}")
+    current_hp_bar = "████████████████████"
+    stdscr.addstr(14, 5, f"HP: {current_hp_bar}")
     stdscr.refresh()
     time.sleep(5)

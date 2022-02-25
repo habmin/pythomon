@@ -64,6 +64,7 @@ def main(stdscr):
         stdscr.clear()
         if grid[player_y][player_x].terrain == "encounter":
             encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]))
+            stdscr.clear()
         print_grid(stdscr, height, width, grid)
         keypress = stdscr.getch()
         if keypress == curses.KEY_LEFT and not player_x == 0:

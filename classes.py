@@ -17,7 +17,7 @@ class Pythomon:
         self.max_hp = pythodeck["hp"]
         self.hp = pythodeck["hp"]
         self.base_atk = pythodeck["base_atk"]
-        self.gender = pythodeck["base_atk"]
+        self.gender = pythodeck["gender"]
         self.nature = traits[randint(0, len(traits) - 1)]
         self.moves = pythodeck["moves"]
         self.exp = 0
