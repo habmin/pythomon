@@ -445,7 +445,7 @@ pythodeck = [
             "     ▒▒▒▒    ▒▒▒  "
         ]},
     {
-        "name": "Puggey Moto ", 
+        "name": "Puggey Moto", 
         "hp": 30, 
         "base_atk": 7, 
         "gender": "suave bird",

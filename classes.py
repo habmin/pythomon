@@ -1,5 +1,6 @@
 from random import randint
 from assets import traits
+from assets import pythodeck
 
 class Player:
     def __init__(self, starter, name = "Ashy", gender = "Male", nature = traits[0]):
@@ -10,6 +11,12 @@ class Player:
         self.gender = gender
         self.nature = nature
         self.defeated = False
+        self.pythomon.append(Pythomon(pythodeck[1]))
+        self.pythomon.append(Pythomon(pythodeck[2]))
+        self.pythomon.append(Pythomon(pythodeck[3]))
+        self.pythomon.append(Pythomon(pythodeck[4]))
+        self.pythomon.append(Pythomon(pythodeck[5]))
+        self.pythomon.append(Pythomon(pythodeck[6]))
 
 class Pythomon:
     def __init__(self, pythodeck):
