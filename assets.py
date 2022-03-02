@@ -10,9 +10,9 @@ pythodeck = [
         "hp": 100,
         "base_atk": 7,
         "gender": "rat",
-        "moves": {
+        "moves": [{
             "name": "Electro",
-            "power": 20},
+            "power": 20}],
         "exp_prize": 50,
         "art": [
             "    ▒▒         ▒▒ ",
@@ -29,9 +29,9 @@ pythodeck = [
         "hp": 70,
         "base_atk": 13,
         "gender": "fire boi",
-        "moves": {
+        "moves": [{
             "name": "Fire",
-            "power": 20},
+            "power": 20}],
         "exp_prize": 50,
         "art": [
             "         ▒▓▓▓▓▒   ",
@@ -48,9 +48,9 @@ pythodeck = [
         "hp": 120,
         "base_atk": 5,
         "gender": "pretty flower",
-        "moves": {
+        "moves": [{
             "name": "Flower",
-            "power": 20},
+            "power": 20}],
         "exp_prize": 50,
         "art": [
             "  ▒▒▒▒▒           ",
@@ -67,9 +67,9 @@ pythodeck = [
         "hp": 85,
         "base_atk": 10,
         "gender": "glasses-wearer",
-        "moves": {
+        "moves": [{
             "name": "Water Gun",
-            "power": 20},
+            "power": 20}],
         "exp_prize": 50,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -88,9 +88,9 @@ pythodeck = [
         "hp": 50, 
         "base_atk": 5,
         "gender": "flying rat",
-        "moves": {
+        "moves": [{
             "name": "SCREAMING",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 15,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -107,9 +107,9 @@ pythodeck = [
         "hp": 60, 
         "base_atk": 7, 
         "gender": "pretty fish",
-        "moves": {
+        "moves": [{
             "name": "Splash",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 15,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -126,9 +126,9 @@ pythodeck = [
         "hp": 70, 
         "base_atk": 0, 
         "gender": "facebook lover",
-        "moves": {
+        "moves": [{
             "name": "Hard Mode",
-            "power": 0},
+            "power": 0}],
         "exp_prize": 50,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -145,9 +145,9 @@ pythodeck = [
         "hp": 70, 
         "base_atk": 10, 
         "gender": "clown doctor",
-        "moves": {
+        "moves": [{
             "name": "Clownin Around",
-            "power": 15},
+            "power": 15}],
         "exp_prize": 50,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -164,9 +164,9 @@ pythodeck = [
         "hp": 20, 
         "base_atk": 5, 
         "gender": "weakling",
-        "moves": {
+        "moves": [{
             "name": "Spits",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 15,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -183,9 +183,9 @@ pythodeck = [
         "hp": 40, 
         "base_atk": 7, 
         "gender": "Free spirit",
-        "moves": {
+        "moves": [{
             "name": "fly hard",
-            "power": 15},
+            "power": 15}],
         "exp_prize": 20,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -202,9 +202,9 @@ pythodeck = [
         "hp": 50, 
         "base_atk": 15, 
         "gender": "real life monkey",
-        "moves": {
+        "moves": [{
             "name": "Rips off arms",
-            "power": 20},
+            "power": 20}],
         "exp_prize": 50,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -221,9 +221,9 @@ pythodeck = [
         "hp": 30, 
         "base_atk": 5, 
         "gender": "dirt lover",
-        "moves": {
+        "moves": [{
             "name": "Dirt mode",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 15,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -240,9 +240,9 @@ pythodeck = [
         "hp": 40, 
         "base_atk": 7, 
         "gender": "wide eye fossil",
-        "moves": {
+        "moves": [{
             "name": "Fossilize",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 25,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -259,9 +259,9 @@ pythodeck = [
         "hp": 40, 
         "base_atk": 7, 
         "gender": "round boi",
-        "moves": {
+        "moves": [{
             "name": "Spinning Belly",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 25,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -278,9 +278,9 @@ pythodeck = [
         "hp": 40, 
         "base_atk": 7, 
         "gender": "soft but tuff guy",
-        "moves": {
+        "moves": [{
             "name": "Wool Choke",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 25,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -297,9 +297,9 @@ pythodeck = [
         "hp": 65, 
         "base_atk": 5, 
         "gender": "cup",
-        "moves": {
+        "moves": [{
             "name": "Leaf Slap",
-            "power": 6},
+            "power": 6}],
         "exp_prize": 20,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -316,9 +316,9 @@ pythodeck = [
         "hp": 20, 
         "base_atk": 2, 
         "gender": "literal child",
-        "moves": {
+        "moves": [{
             "name": "Whine",
-            "power": 5},
+            "power": 5}],
         "exp_prize": 10,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -335,9 +335,9 @@ pythodeck = [
         "hp": 50, 
         "base_atk": 10, 
         "gender": "mad-man",
-        "moves": {
+        "moves": [{
             "name": "Dunk",
-            "power": 15},
+            "power": 15}],
         "exp_prize": 25,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -354,9 +354,9 @@ pythodeck = [
         "hp": 40, 
         "base_atk": 7, 
         "gender": "glompper",
-        "moves": {
+        "moves": [{
             "name": "Mud Kiss",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 17,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -373,9 +373,9 @@ pythodeck = [
         "hp": 30, 
         "base_atk": 15, 
         "gender": "powerhouse",
-        "moves": {
+        "moves": [{
             "name": "Potassium",
-            "power": 30},
+            "power": 30}],
         "exp_prize": 100,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -392,9 +392,9 @@ pythodeck = [
         "hp": 45, 
         "base_atk": 10, 
         "gender": "fluff-o",
-        "moves": {
+        "moves": [{
             "name": "Cute attack",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 20,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -411,9 +411,9 @@ pythodeck = [
         "hp": 35, 
         "base_atk": 7, 
         "gender": "piece of rope",
-        "moves": {
+        "moves": [{
             "name": "Big Bite",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 20,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -430,9 +430,9 @@ pythodeck = [
         "hp": 50, 
         "base_atk": 10, 
         "gender": "Sneaker Head",
-        "moves": {
+        "moves": [{
             "name": "Eletric Drip",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 30,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
@@ -449,9 +449,9 @@ pythodeck = [
         "hp": 30, 
         "base_atk": 7, 
         "gender": "suave bird",
-        "moves": {
+        "moves": [{
             "name": "Swoop",
-            "power": 10},
+            "power": 10}],
         "exp_prize": 25,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",

@@ -166,12 +166,11 @@ def print_grid(stdscr, h, w, grid):
 def encounter(stdscr, h, w, player, pythomon_target):
     # 1. print encounter
     init_menu = ["Fight", "Item", "Run"]
-    player_pythomon_menu = []
-    for pythomon in player.pythomon:
-        player_pythomon_menu.append(pythomon.name)
+    engaged_menu = ["Attack", "Item", "Switch", "Run"]
+    moves_selection = 0
     init_selection = 0
+    mode = "Start"
     keypress = 0
-    fight_select = False
     pythodeck_selection = 0
     start_range = 0
     end_range = start_range + 4
@@ -179,54 +178,106 @@ def encounter(stdscr, h, w, player, pythomon_target):
     while True:
         stdscr.clear()
 
+        # Always print encountered pythomon
         for i, line in enumerate(pythomon_target.art):
             stdscr.addstr(i + 3, 50, line[::-1])
         stdscr.addstr(12, 50, pythomon_target.name)
         stdscr.addstr(13, 50, f"{pythomon_target.nature} {pythomon_target.gender}")
         encounter_hp_bar = "████████████████████"
         stdscr.addstr(14, 50, f"HP: {encounter_hp_bar}")
-
-        for i, option in enumerate(init_menu):
-            if i == init_selection:
-                stdscr.attron(curses.color_pair(1))
-                stdscr.addstr((17) + i, 5, option)
-                stdscr.attroff(curses.color_pair(1))
-            else:
-                stdscr.addstr(17 + i, 5, option)
         
-        if not fight_select:
-            keypress = stdscr.getch()
-            if keypress == curses.KEY_UP and init_selection > 0:
-                init_selection -= 1
-            elif keypress == curses.KEY_DOWN and init_selection < (len(init_menu) - 1):
-                init_selection += 1
-            elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Fight":
-                fight_select = True
-        
-        if fight_select:
-            # select from player's pythomon roster
-            for i, option in enumerate(player.pythomon[start_range:min(end_range, max_range)]):
-                blank_space = ' ' * (16 - len(option.name))
-                if i == pythodeck_selection:
+        # Engaged mode (selected a pythomon)
+        if mode == "Engaged" or mode == "Attack":
+            # Print player's pythomon
+            for i, line in enumerate(player.pythomon[pythodeck_selection + start_range].art):
+                stdscr.addstr(i + 3, 5, line)
+                stdscr.addstr(12, 5, player.pythomon[pythodeck_selection + start_range].name)
+                stdscr.addstr(13, 5, f"{player.pythomon[pythodeck_selection + start_range].nature} {player.pythomon[pythodeck_selection + start_range].gender}")
+                current_hp_bar = "████████████████████"
+                stdscr.addstr(14, 5, f"HP: {current_hp_bar}")
+            
+            # Print menu option for engaged mode
+            for i, option in enumerate(engaged_menu):
+                if i == init_selection:
                     stdscr.attron(curses.color_pair(1))
-                    stdscr.addstr((17) + i, 20, f"{option.name}{blank_space}HP:{option.hp}/{option.max_hp}")
+                    stdscr.addstr((17) + i, 5, option)
                     stdscr.attroff(curses.color_pair(1))
                 else:
-                    stdscr.addstr((17) + i, 20, f"{option.name}{blank_space}HP:{option.hp}/{option.max_hp}")
+                    stdscr.addstr(17 + i, 5, option)
             
-            keypress = stdscr.getch()    
-            if keypress == curses.KEY_UP and pythodeck_selection > start_range:
-                pythodeck_selection -= 1
-            elif keypress == curses.KEY_UP and pythodeck_selection == start_range and pythodeck_selection > 0:
-                start_range -= 1
-                end_range -= 1
-            elif keypress == curses.KEY_DOWN and pythodeck_selection < (len(player.pythomon[start_range:min(end_range, max_range)]) - 1):
-                pythodeck_selection += 1
-            elif keypress == curses.KEY_DOWN and pythodeck_selection == (len(player.pythomon[start_range:min(end_range, max_range)]) - 1) and end_range != len(player.pythomon):
-                start_range += 1
-                end_range += 1
-            elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
-                break
+            if mode == "Engaged":
+                keypress = stdscr.getch()
+                if keypress == curses.KEY_UP and init_selection > 0:
+                    init_selection -= 1
+                elif keypress == curses.KEY_DOWN and init_selection < (len(engaged_menu) - 1):
+                    init_selection += 1
+                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Attack":
+                   mode = "Attack"
+            
+            elif mode == "Attack":
+                for i, option in enumerate(player.pythomon[pythodeck_selection + start_range].moves):
+                    blank_space = ' ' * (16 - len(option["name"]))
+                    if i == moves_selection:
+                        stdscr.attron(curses.color_pair(1))
+                        stdscr.addstr((17) + i, 20, "{}{}POW:{}".format(option["name"], blank_space, option["power"]))
+                        stdscr.attroff(curses.color_pair(1))
+                    else:
+                        stdscr.addstr((17) + i, 20, "{}{}POW:{}".format(option["name"], blank_space, option["power"]))
+
+                keypress = stdscr.getch()
+                if keypress == curses.KEY_UP and moves_selection > 0:
+                    moves_selection -= 1
+                elif keypress == curses.KEY_DOWN and moves_selection < (len(player.pythomon[pythodeck_selection + start_range].moves) - 1):
+                    moves_selection += 1
+                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
+                    break
+
+        # Initial start of encounter mode
+        if mode == "Start" or mode == "Select Pythomon":
+            # Print initial menu
+            for i, option in enumerate(init_menu):
+                if i == init_selection:
+                    stdscr.attron(curses.color_pair(1))
+                    stdscr.addstr((17) + i, 5, option)
+                    stdscr.attroff(curses.color_pair(1))
+                else:
+                    stdscr.addstr(17 + i, 5, option)
+            
+            # Sub-menu is 
+            if mode == "Start":
+                keypress = stdscr.getch()
+                if keypress == curses.KEY_UP and init_selection > 0:
+                    init_selection -= 1
+                elif keypress == curses.KEY_DOWN and init_selection < (len(init_menu) - 1):
+                    init_selection += 1
+                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Fight":
+                    mode = "Select Pythomon"
+
+            elif mode == "Select Pythomon":
+                # select from player's pythomon roster
+                for i, option in enumerate(player.pythomon[start_range:min(end_range, max_range)]):
+                    blank_space = ' ' * (16 - len(option.name))
+                    if i == pythodeck_selection:
+                        stdscr.attron(curses.color_pair(1))
+                        stdscr.addstr((17) + i, 20, f"{option.name}{blank_space}HP:{option.hp}/{option.max_hp}")
+                        stdscr.attroff(curses.color_pair(1))
+                    else:
+                        stdscr.addstr((17) + i, 20, f"{option.name}{blank_space}HP:{option.hp}/{option.max_hp}")
+            
+                keypress = stdscr.getch()    
+            
+                if keypress == curses.KEY_UP and pythodeck_selection > start_range:
+                    pythodeck_selection -= 1
+                elif keypress == curses.KEY_UP and pythodeck_selection == start_range and pythodeck_selection > 0:
+                    start_range -= 1
+                    end_range -= 1
+                elif keypress == curses.KEY_DOWN and pythodeck_selection < (len(player.pythomon[start_range:min(end_range, max_range)]) - 1):
+                    pythodeck_selection += 1
+                elif keypress == curses.KEY_DOWN and pythodeck_selection == (len(player.pythomon[start_range:min(end_range, max_range)]) - 1) and end_range != len(player.pythomon):
+                    start_range += 1
+                    end_range += 1
+                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
+                    mode = "Engaged"
         
         stdscr.refresh()
     # 2. menu
@@ -237,11 +288,6 @@ def encounter(stdscr, h, w, player, pythomon_target):
     # 3. battle
         # if win, capture
         # if lose, go to next pythomon or game over
-    for i, line in enumerate(player.pythomon[pythodeck_selection + start_range].art):
-        stdscr.addstr(i + 3, 5, line)
-    stdscr.addstr(12, 5, player.pythomon[pythodeck_selection + start_range].name)
-    stdscr.addstr(13, 5, f"{player.pythomon[pythodeck_selection + start_range].nature} {player.pythomon[pythodeck_selection + start_range].gender}")
-    current_hp_bar = "████████████████████"
-    stdscr.addstr(14, 5, f"HP: {current_hp_bar}")
+
     stdscr.refresh()
     time.sleep(5)
