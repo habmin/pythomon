@@ -199,6 +199,38 @@ def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target, players_turn
     time.sleep(2)
     return did_defeat
 
+def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_owner):
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    stdscr.addstr(h, 5, f"{player.name} defeated {encounter_owner} {encounter.name}!")
+    stdscr.refresh()
+    time.sleep(2)
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    stdscr.addstr(h, 5, f"You gained ${encounter.money_prize}!")
+    player.money += encounter.money_prize
+    stdscr.refresh()
+    time.sleep(2)
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    stdscr.addstr(h, 5, f"{players_pythomon.name} gained {encounter.exp_prize} EXP!")
+    stdscr.refresh()
+    time.sleep(2)
+    if players_pythomon.level_up(encounter.exp_prize):
+        stdscr.addstr(h, 0, f"{' ' * w}")
+        stdscr.addstr(h, 5, f"{players_pythomon.name} leveled up! Gained 3 MAX HP and ATK")
+        stdscr.refresh()
+        time.sleep(2)
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    stdscr.addstr(h, 5, f"Your team gains {encounter.exp_prize // 2} EXP!")
+    stdscr.refresh()
+    time.sleep(2)
+    for pythomon in player.pythomon:
+        if pythomon == players_pythomon:
+            pass
+        elif pythomon.level_up(encounter.exp_prize // 2):
+            stdscr.addstr(h, 0, f"{' ' * w}")
+            stdscr.addstr(h, 5, f"{pythomon.name} leveled up! Gained 3 MAX HP and ATK")
+            stdscr.refresh()
+            time.sleep(2)
+
 def encounter(stdscr, h, w, player, pythomon_target):
     # 1. print encounter
     init_menu = ["Fight", "Item", "Run"]
@@ -261,14 +293,12 @@ def encounter(stdscr, h, w, player, pythomon_target):
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
                         # Commence attack! Returns true if target is defeated
                         if attack_prompts(stdscr, 17, w, f"{player.name}'s", player.pythomon[pythodeck_selection + start_range], moves_selection, pythomon_target, True):
-                            # means player defeated
-                            player.money += pythomon_target.money_prize
-                            if player.pythomon[pythodeck_selection + start_range].level_up(pythomon_target.exp_prize):
-                                # means pythomon leveled up
-                                pass
-                            # should break out of loop i guess
-                        turn += 1
-                        mode = "CPU"
+                            win_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + start_range], pythomon_target, "Wild")
+                            # exit encounter
+                            break
+                        else:
+                            turn += 1
+                            mode = "CPU"
 
             # Initial start of encounter mode
             if mode == "Start" or mode == "Select Pythomon":

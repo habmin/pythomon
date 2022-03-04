@@ -464,14 +464,14 @@ pythodeck = [
             "     ▒▒▒▒    ▒▒▒  "
         ]},
     {
-        "name": "Kill Tester", 
-        "hp": 100, 
+        "name": "EXP Tester", 
+        "hp": 5, 
         "base_atk": 100, 
         "gender": "suave bird",
         "moves": [{
             "name": "Swoop",
             "power": 100}],
-        "exp_prize": 25,
+        "exp_prize": 200,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",

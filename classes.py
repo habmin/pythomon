@@ -35,7 +35,7 @@ class Pythomon:
         self.moves = pythodeck["moves"]
         self.exp = 0
         self.exp_prize = pythodeck["exp_prize"]
-        self.money_prize = 15
+        self.money_prize = 20
         self.status = "alive"
         self.art = pythodeck["art"]
         self.healthbar = "████████████████████"
@@ -45,7 +45,10 @@ class Pythomon:
         if exp >= 100:
             self.max_hp += 3
             self.base_atk += 3
-            self.hp = self.max_hp
+            if self.status == "alive":
+                self.hp = self.max_hp
+                self.healthbar = "████████████████████"
+            self.exp = 100 - self.exp
             return True
         return False
     
