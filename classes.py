@@ -11,12 +11,12 @@ class Player:
         self.gender = gender
         self.nature = nature
         self.defeated = False
-        self.pythomon.append(Pythomon(pythodeck[1]))
-        self.pythomon.append(Pythomon(pythodeck[2]))
-        self.pythomon.append(Pythomon(pythodeck[3]))
-        self.pythomon.append(Pythomon(pythodeck[4]))
-        self.pythomon.append(Pythomon(pythodeck[5]))
-        self.pythomon.append(Pythomon(pythodeck[6]))
+        # self.pythomon.append(Pythomon(pythodeck[1]))
+        # self.pythomon.append(Pythomon(pythodeck[2]))
+        # self.pythomon.append(Pythomon(pythodeck[3]))
+        # self.pythomon.append(Pythomon(pythodeck[4]))
+        # self.pythomon.append(Pythomon(pythodeck[5]))
+        # self.pythomon.append(Pythomon(pythodeck[6]))
     
     def check_defeated(self):
         for pytho in self.pythomon:

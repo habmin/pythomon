@@ -3,14 +3,12 @@ from sys import stderr
 import time
 import random
 from classes import *
+from assets import title
+from assets import gameover
 from assets import traits
 from assets import pythodeck
 
 def start_screen(stdscr, h, w):
-    title = ["  _ \ \ \   / __ __|  |   |   _ \    \  |   _ \    \  |  |",
-             " |   | \   /     |    |   |  |   |  |\/ |  |   |    \ |  |",
-             " ___/     |      |    ___ |  |   |  |   |  |   |  |\  | _|",
-             "_|       _|     _|   _|  _| \___/  _|  _| \___/  _| \_| _)"]
     subtitle = "Pythomon! - A Python Battle Game!"
     directions = "Use arrow keys to select"
 
@@ -174,9 +172,11 @@ def print_menu_1(stdscr, h, w, menu, selection):
         else:
             stdscr.addstr(h + i, w, option)
 
-def print_pythomon(stdscr, h, w, pythomon, player_ownership):
+def print_pythomon(stdscr, h, w, pythomon, player_ownership, dead):
     for i, line in enumerate(pythomon.art):
-        if player_ownership:
+        if dead:
+            stdscr.addstr(i + h, w, (' ' * 20))
+        elif player_ownership:
             stdscr.addstr(i + h, w, line)
         else:
             stdscr.addstr(i + h, w, line[::-1])
@@ -190,9 +190,9 @@ def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target, players_turn
     stdscr.refresh()
     time.sleep(2)
     if players_turn:
-        print_pythomon(stdscr, 3, 50, target, not players_turn)
+        print_pythomon(stdscr, 3, 50, target, not players_turn, False)
     else:
-        print_pythomon(stdscr, 3, 5, target, not players_turn)
+        print_pythomon(stdscr, 3, 5, target, not players_turn, False)
     stdscr.addstr(h, 0, f"{' ' * w}")
     stdscr.addstr(h, 5, f"{target.name} took {attacker.base_atk + attacker.moves[move_idx].get('power')} damage!")
     stdscr.refresh()
@@ -231,6 +231,30 @@ def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_own
             stdscr.refresh()
             time.sleep(2)
 
+def print_gameover(stdscr, h, w):
+    stdscr.clear()
+    for i, line in enumerate(gameover):
+        stdscr.attron(curses.color_pair(2))
+        stdscr.addstr((h // 2) - (10 - i), ((w // 2) - (len(line) // 2)), line)
+        stdscr.attroff(curses.color_pair(2))
+    stdscr.addstr((h // 2) + 2, ((w // 2) - (len("Thanks for playing!") // 2)), "Thanks for playing!")
+    stdscr.refresh()
+    time.sleep(5)
+
+def defeated_prompts(stdscr, h, w, player, defeated_pythomon, encounter, encounter_owner):
+    print_pythomon(stdscr, 3, 5, defeated_pythomon, True, True)
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    stdscr.addstr(h, 5, f"{encounter_owner} {encounter.name} defeated your {defeated_pythomon.name}!")
+    stdscr.refresh()
+    time.sleep(2)
+    if player.check_defeated():
+        stdscr.addstr(h, 0, f"{' ' * w}")
+        stdscr.addstr(h, 5, f"Your entire team is wiped out!")
+        stdscr.refresh()
+        time.sleep(3)
+        return True
+    return False
+
 def encounter(stdscr, h, w, player, pythomon_target):
     # 1. print encounter
     init_menu = ["Fight", "Item", "Run"]
@@ -249,11 +273,11 @@ def encounter(stdscr, h, w, player, pythomon_target):
         stdscr.clear()
 
         # Always print encountered pythomon
-        print_pythomon(stdscr, 3, 50, pythomon_target, False)
+        print_pythomon(stdscr, 3, 50, pythomon_target, False, False)
         
         if deployed:
             # Print player's pythomon
-            print_pythomon(stdscr, 3, 5, player.pythomon[pythodeck_selection + start_range], True)
+            print_pythomon(stdscr, 3, 5, player.pythomon[pythodeck_selection + start_range], True, False)
 
         if turn % 2 == 1:
             # Engaged mode (selected a pythomon)
@@ -349,8 +373,8 @@ def encounter(stdscr, h, w, player, pythomon_target):
         # computer's turn
         else:
             if attack_prompts(stdscr, 17, w, "Wild", pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + start_range], False):
-                if player.check_defeated():
-                    # game over
+                if defeated_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + start_range], pythomon_target, "Wild"):
+                    print_gameover(stdscr, h, w)
                     curses.curs_set(1)
                     curses.endwin()
                     exit(0)
@@ -362,13 +386,6 @@ def encounter(stdscr, h, w, player, pythomon_target):
             turn += 1
 
         stdscr.refresh()
-    # 2. menu
-        # fight
-            # choose pokemon
-        # item
-        # run
-    # 3. battle
-        # if win, capture
-        # if lose, go to next pythomon or game over
-
-    stdscr.refresh()
+    
+    # player was not defeated by encounter
+    return False
