@@ -1,6 +1,7 @@
 import curses
 from sys import stderr
 import time
+import random
 from classes import *
 from assets import traits
 from assets import pythodeck
@@ -261,6 +262,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                                 # means pythomon leveled up
                                 pass
                             # should break out of loop i guess
+                        turn += 1
                         mode = "Engaged"
 
             # Initial start of encounter mode
@@ -311,7 +313,8 @@ def encounter(stdscr, h, w, player, pythomon_target):
 
         # computer's turn
         else:
-            pass
+            if attack_prompts(stdscr, h, w, "Wild", pythomon_target, player.pythomon[pythodeck_selection + start_range], random.randint(0, len(pythomon_target.moves) - 1)):
+                pass
         stdscr.refresh()
     # 2. menu
         # fight
