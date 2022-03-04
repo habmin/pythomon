@@ -265,7 +265,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
     keypress = 0
     pythodeck_selection = 0
     start_range = 0
-    end_range = start_range + 4
+    end_range = start_range + min(len(player.pythomon), 4)
     max_range = len(player.pythomon)
     turn = 1
     deployed = False
