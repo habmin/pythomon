@@ -14,7 +14,7 @@ def start_screen(stdscr, h, w):
     directions = "Use arrow keys to select"
 
     # Menu selection variables
-    menu = ["Start a New Game", "Quit"]
+    menu = ["New Game", "Quit"]
     selection = 0
     keypress = 0
 
@@ -44,7 +44,7 @@ def start_screen(stdscr, h, w):
             selection -= 1
         elif keypress == curses.KEY_DOWN and selection < (len(menu) - 1):
             selection += 1
-        elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Start a New Game":
+        elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "New Game":
             break
         elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Quit":
             exit(0)
@@ -164,7 +164,16 @@ def print_grid(stdscr, h, w, grid):
         stdscr.addstr(2 + i, 2 + (3 * (j + 1)), "║")
     stdscr.addstr(len(grid) + 2, 1, f"╚{line}╝")
 
-def output_pythomon_art(stdscr, h, w, pythomon, player_ownership):
+def print_menu_1(stdscr, h, w, menu, selection):
+    for i, option in enumerate(menu):
+        if i == selection:
+            stdscr.attron(curses.color_pair(1))
+            stdscr.addstr(h + i, w, option)
+            stdscr.attroff(curses.color_pair(1))
+        else:
+            stdscr.addstr(h + i, w, option)
+
+def print_pythomon(stdscr, h, w, pythomon, player_ownership):
     for i, line in enumerate(pythomon.art):
         if player_ownership:
             stdscr.addstr(i + h, w, line)
@@ -202,23 +211,17 @@ def encounter(stdscr, h, w, player, pythomon_target):
         stdscr.clear()
 
         # Always print encountered pythomon
-        output_pythomon_art(stdscr, 3, 50, pythomon_target, False)
+        print_pythomon(stdscr, 3, 50, pythomon_target, False)
         
         if deployed:
             # Print player's pythomon
-            output_pythomon_art(stdscr, 3, 5, player.pythomon[pythodeck_selection + start_range], True)
+            print_pythomon(stdscr, 3, 5, player.pythomon[pythodeck_selection + start_range], True)
 
         if turn % 2 == 1:
             # Engaged mode (selected a pythomon)
             if mode == "Engaged" or mode == "Attack":                
                 # Print menu option for engaged mode
-                for i, option in enumerate(engaged_menu):
-                    if i == init_selection:
-                        stdscr.attron(curses.color_pair(1))
-                        stdscr.addstr((19) + i, 5, option)
-                        stdscr.attroff(curses.color_pair(1))
-                    else:
-                        stdscr.addstr(19 + i, 5, option)
+                print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
                 
                 if mode == "Engaged":
                     keypress = stdscr.getch()
@@ -228,6 +231,8 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         init_selection += 1
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Attack":
                         mode = "Attack"
+                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Run":
+                        break
                 
                 elif mode == "Attack":
                     stdscr.addstr(19, 15, ">")
@@ -261,13 +266,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
             # Initial start of encounter mode
             if mode == "Start" or mode == "Select Pythomon":
                 # Print initial menu
-                for i, option in enumerate(init_menu):
-                    if i == init_selection:
-                        stdscr.attron(curses.color_pair(1))
-                        stdscr.addstr((19) + i, 5, option)
-                        stdscr.attroff(curses.color_pair(1))
-                    else:
-                        stdscr.addstr(19 + i, 5, option)
+                print_menu_1(stdscr, 19, 5, init_menu, init_selection)
                 
                 if mode == "Start":
                     keypress = stdscr.getch()
@@ -277,6 +276,8 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         init_selection += 1
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Fight":
                         mode = "Select Pythomon"
+                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Run":
+                        break
 
                 elif mode == "Select Pythomon":
                     # select from player's pythomon roster
@@ -307,6 +308,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
                         deployed = True
                         mode = "Engaged"
+
         # computer's turn
         else:
             pass
@@ -321,4 +323,3 @@ def encounter(stdscr, h, w, player, pythomon_target):
         # if lose, go to next pythomon or game over
 
     stdscr.refresh()
-    time.sleep(5)
