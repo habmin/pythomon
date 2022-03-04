@@ -17,6 +17,12 @@ class Player:
         self.pythomon.append(Pythomon(pythodeck[4]))
         self.pythomon.append(Pythomon(pythodeck[5]))
         self.pythomon.append(Pythomon(pythodeck[6]))
+    
+    def check_defeated(self):
+        for pytho in self.pythomon:
+            if pytho.status == "alive":
+                return False
+        return True
 
 class Pythomon:
     def __init__(self, pythodeck):
@@ -32,7 +38,8 @@ class Pythomon:
         self.money_prize = 15
         self.status = "alive"
         self.art = pythodeck["art"]
-    
+        self.healthbar = "████████████████████"
+
     def level_up(self, exp):
         self.exp += exp
         if exp >= 100:
@@ -41,8 +48,16 @@ class Pythomon:
             self.hp = self.max_hp
             return True
         return False
+    
+    def attack(self, target, move_selection):
+        target.hp -= self.base_atk + self.moves[move_selection]["power"]
+        target.healthbar = ("█" * int(((target.hp / target.max_hp) * 20))) + ("░" * (20 - int(((target.hp / target.max_hp) * 20))))
+        if target.hp <= 0:
+            target.hp = 0
+            target.status = "dead"
+            return True
+        return False
         
-
 class Trainer:
     def __init__(self, name, pythomon, money, prize, about, flair):
         self.name = name
@@ -60,10 +75,6 @@ class Square:
     
     def __repr__(self) -> str:
         return f"{self.terrain} - Player occupied: {self.player_occupied}"
-
-class Grid:
-    def __init__(self):
-        pass
 
 class Item:
     def __init__(self, name):

@@ -60,12 +60,22 @@ def main(stdscr):
     #     # print grid
     player_x = 0
     player_y = 0
-    while True:
+    
+    while not player.defeated:
         stdscr.clear()
+
         if grid[player_y][player_x].terrain == "encounter":
             encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]))
             stdscr.clear()
+        
+        elif grid[player_y][player_x].terrain == "store":
+            stdscr.clear()
+
+        elif grid[player_y][player_x].terrain == "trainer":
+            stdscr.clear()
+
         print_grid(stdscr, height, width, grid)
+
         keypress = stdscr.getch()
         if keypress == curses.KEY_LEFT and not player_x == 0:
             grid[player_y][player_x].player_occupied = False
@@ -83,8 +93,10 @@ def main(stdscr):
             grid[player_y][player_x].player_occupied = False
             player_y += 1
             grid[player_y][player_x].player_occupied = True    
+        
         stdscr.refresh()
-    # Done with program, reset curs_set and end
+    
+    # Done with game, reset curs_set and end
     curses.curs_set(1)
     curses.endwin()
     exit(0)
