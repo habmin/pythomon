@@ -184,15 +184,20 @@ def print_pythomon(stdscr, h, w, pythomon, player_ownership):
     stdscr.addstr(h + 10, w, f"{pythomon.nature} {pythomon.gender}")
     stdscr.addstr(h + 11, w, f"HP: {pythomon.healthbar}")
 
-def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target):
-    stdscr.addstr(17, 5, f"{owner} {attacker.name} uses {attacker.moves[move_idx].get('name')} against {target.name}!")
+def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target, players_turn):
+    did_defeat = attacker.attack(target, move_idx)
+    stdscr.addstr(h, 5, f"{owner} {attacker.name} uses {attacker.moves[move_idx].get('name')} against {target.name}!")
     stdscr.refresh()
     time.sleep(2)
-    stdscr.addstr(17, 5, f"{' ' * w}")
-    stdscr.addstr(17, 5, f"{target.name} took {attacker.base_atk + attacker.moves[move_idx].get('power')} damage!")
+    if players_turn:
+        print_pythomon(stdscr, 3, 50, target, not players_turn)
+    else:
+        print_pythomon(stdscr, 3, 5, target, not players_turn)
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    stdscr.addstr(h, 5, f"{target.name} took {attacker.base_atk + attacker.moves[move_idx].get('power')} damage!")
     stdscr.refresh()
     time.sleep(2)
-    return attacker.attack(target, move_idx)
+    return did_defeat
 
 def encounter(stdscr, h, w, player, pythomon_target):
     # 1. print encounter
@@ -255,7 +260,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         mode = "Engaged"
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
                         # Commence attack! Returns true if target is defeated
-                        if attack_prompts(stdscr, h, w, f"{player.name}'s", player.pythomon[pythodeck_selection + start_range], moves_selection, pythomon_target):
+                        if attack_prompts(stdscr, 17, w, f"{player.name}'s", player.pythomon[pythodeck_selection + start_range], moves_selection, pythomon_target, True):
                             # means player defeated
                             player.money += pythomon_target.money_prize
                             if player.pythomon[pythodeck_selection + start_range].level_up(pythomon_target.exp_prize):
@@ -263,7 +268,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                                 pass
                             # should break out of loop i guess
                         turn += 1
-                        mode = "Engaged"
+                        mode = "CPU"
 
             # Initial start of encounter mode
             if mode == "Start" or mode == "Select Pythomon":
@@ -307,14 +312,25 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         end_range += 1
                     elif keypress == curses.KEY_BACKSPACE or keypress == 8:
                         mode = "Start"
-                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
+                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and player.pythomon[pythodeck_selection + start_range].status == "alive":
                         deployed = True
                         mode = "Engaged"
 
         # computer's turn
         else:
-            if attack_prompts(stdscr, h, w, "Wild", pythomon_target, player.pythomon[pythodeck_selection + start_range], random.randint(0, len(pythomon_target.moves) - 1)):
-                pass
+            if attack_prompts(stdscr, 17, w, "Wild", pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + start_range], False):
+                if player.check_defeated():
+                    # game over
+                    curses.curs_set(1)
+                    curses.endwin()
+                    exit(0)
+                else:
+                    deployed = False
+                    mode = "Start"
+            else:
+                mode = "Engaged"
+            turn += 1
+
         stdscr.refresh()
     # 2. menu
         # fight

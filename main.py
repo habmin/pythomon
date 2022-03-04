@@ -65,7 +65,8 @@ def main(stdscr):
         stdscr.clear()
 
         if grid[player_y][player_x].terrain == "encounter":
-            encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]))
+            # encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]))
+            encounter(stdscr, height, width, player, Pythomon(pythodeck[24]))
             grid[player_y][player_x].terrain = "grass"
             stdscr.clear()
         

@@ -54,6 +54,7 @@ class Pythomon:
         target.healthbar = ("█" * int(((target.hp / target.max_hp) * 20))) + ("░" * (20 - int(((target.hp / target.max_hp) * 20))))
         if target.hp <= 0:
             target.hp = 0
+            target.healthbar = "░░░░░░░░░░░░░░░░░░░░"
             target.status = "dead"
             return True
         return False
