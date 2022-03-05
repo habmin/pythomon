@@ -7,7 +7,7 @@ class Player:
         self.name = name
         self.money = 100
         self.pythomon = [starter]
-        self.bag = ["Health Spray", "Health Spray", "Capture Ball", "Capture Ball", "Capture Ball"]
+        self.bag = ["Health Spray", "Health Spray", "Health Spray", "Capture Ball", "Capture Ball", "Capture Ball"]
         self.gender = gender
         self.nature = nature
         self.defeated = False

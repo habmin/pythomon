@@ -261,12 +261,16 @@ def encounter(stdscr, h, w, player, pythomon_target):
     engaged_menu = ["Attack", "Item", "Switch", "Run"]
     moves_selection = 0
     init_selection = 0
+    item_selection = 0
     mode = "Start"
     keypress = 0
     pythodeck_selection = 0
-    start_range = 0
-    end_range = start_range + min(len(player.pythomon), 4)
-    max_range = len(player.pythomon)
+    pytho_start_range = 0
+    pytho_end_range = pytho_start_range + min(len(player.pythomon), 4)
+    pytho_max_range = len(player.pythomon)
+    item_start_range = 0
+    item_end_range = item_start_range + min(len(player.bag), 4)
+    item_max_range = len(player.bag)
     turn = 1
     deployed = False
     while pythomon_target.hp > 0:
@@ -277,9 +281,10 @@ def encounter(stdscr, h, w, player, pythomon_target):
         
         if deployed:
             # Print player's pythomon
-            print_pythomon(stdscr, 3, 5, player.pythomon[pythodeck_selection + start_range], True, False)
+            print_pythomon(stdscr, 3, 5, player.pythomon[pythodeck_selection + pytho_start_range], True, False)
 
         if turn % 2 == 1:
+            
             # Engaged mode (selected a pythomon)
             if mode == "Engaged" or mode == "Attack":                
                 # Print menu option for engaged mode
@@ -298,7 +303,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 
                 elif mode == "Attack":
                     stdscr.addstr(19, 15, ">")
-                    for i, option in enumerate(player.pythomon[pythodeck_selection + start_range].moves):
+                    for i, option in enumerate(player.pythomon[pythodeck_selection + pytho_start_range].moves):
                         blank_space = ' ' * (16 - len(option["name"]))
                         if i == moves_selection:
                             stdscr.attron(curses.color_pair(1))
@@ -310,14 +315,14 @@ def encounter(stdscr, h, w, player, pythomon_target):
                     keypress = stdscr.getch()
                     if keypress == curses.KEY_UP and moves_selection > 0:
                         moves_selection -= 1
-                    elif keypress == curses.KEY_DOWN and moves_selection < (len(player.pythomon[pythodeck_selection + start_range].moves) - 1):
+                    elif keypress == curses.KEY_DOWN and moves_selection < (len(player.pythomon[pythodeck_selection + pytho_start_range].moves) - 1):
                         moves_selection += 1
                     elif keypress == curses.KEY_BACKSPACE or keypress == 8:
                         mode = "Engaged"
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
                         # Commence attack! Returns true if target is defeated
-                        if attack_prompts(stdscr, 17, w, f"{player.name}'s", player.pythomon[pythodeck_selection + start_range], moves_selection, pythomon_target, True):
-                            win_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + start_range], pythomon_target, "Wild")
+                        if attack_prompts(stdscr, 17, w, f"{player.name}'s", player.pythomon[pythodeck_selection + pytho_start_range], moves_selection, pythomon_target, True):
+                            win_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], pythomon_target, "Wild")
                             # exit encounter
                             break
                         else:
@@ -325,7 +330,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                             mode = "CPU"
 
             # Initial start of encounter mode
-            if mode == "Start" or mode == "Select Pythomon":
+            if mode == "Start" or mode == "Select Pythomon" or mode == "Item":
                 # Print initial menu
                 print_menu_1(stdscr, 19, 5, init_menu, init_selection)
                 
@@ -339,11 +344,13 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         mode = "Select Pythomon"
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Run":
                         break
+                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Item":
+                        mode = "Item"
 
                 elif mode == "Select Pythomon":
                     # select from player's pythomon roster
                     stdscr.addstr(19, 15, ">")
-                    for i, option in enumerate(player.pythomon[start_range:min(end_range, max_range)]):
+                    for i, option in enumerate(player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)]):
                         blank_space = ' ' * (16 - len(option.name))
                         if i == pythodeck_selection:
                             stdscr.attron(curses.color_pair(1))
@@ -354,26 +361,53 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 
                     keypress = stdscr.getch()    
                 
-                    if keypress == curses.KEY_UP and pythodeck_selection > start_range:
+                    if keypress == curses.KEY_UP and pythodeck_selection > pytho_start_range:
                         pythodeck_selection -= 1
-                    elif keypress == curses.KEY_UP and pythodeck_selection == start_range and pythodeck_selection > 0:
-                        start_range -= 1
-                        end_range -= 1
-                    elif keypress == curses.KEY_DOWN and pythodeck_selection < (len(player.pythomon[start_range:min(end_range, max_range)]) - 1):
+                    elif keypress == curses.KEY_UP and pythodeck_selection == pytho_start_range and pythodeck_selection > 0:
+                        pytho_start_range -= 1
+                        pytho_end_range -= 1
+                    elif keypress == curses.KEY_DOWN and pythodeck_selection < (len(player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)]) - 1):
                         pythodeck_selection += 1
-                    elif keypress == curses.KEY_DOWN and pythodeck_selection == (len(player.pythomon[start_range:min(end_range, max_range)]) - 1) and end_range != len(player.pythomon):
-                        start_range += 1
-                        end_range += 1
+                    elif keypress == curses.KEY_DOWN and pythodeck_selection == (len(player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)]) - 1) and pytho_end_range != len(player.pythomon):
+                        pytho_start_range += 1
+                        pytho_end_range += 1
                     elif keypress == curses.KEY_BACKSPACE or keypress == 8:
                         mode = "Start"
-                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and player.pythomon[pythodeck_selection + start_range].status == "alive":
+                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and player.pythomon[pythodeck_selection + pytho_start_range].status == "alive":
                         deployed = True
                         mode = "Engaged"
-
+                
+                elif mode == "Item":
+                    stdscr.addstr(19, 15, ">")
+                    for i, item in enumerate(player.bag[item_start_range:min(item_end_range, item_max_range)]):
+                        blank_space = ' ' * (16 - len(item))
+                        if i == item_selection:
+                            stdscr.attron(curses.color_pair(1))
+                            stdscr.addstr((19) + i, 20, item)
+                            stdscr.attroff(curses.color_pair(1))
+                        else:
+                            stdscr.addstr((19) + i, 20, item)
+                
+                    keypress = stdscr.getch()    
+                
+                    if keypress == curses.KEY_UP and item_selection > item_start_range:
+                        item_selection -= 1
+                    elif keypress == curses.KEY_UP and item_selection == item_start_range and item_selection > 0:
+                        item_start_range -= 1
+                        item_end_range -= 1
+                    elif keypress == curses.KEY_DOWN and item_selection < (len(player.bag[item_start_range:min(item_end_range, item_max_range)]) - 1):
+                        item_selection += 1
+                    elif keypress == curses.KEY_DOWN and item_selection == (len(player.bag[item_start_range:min(item_end_range, item_max_range)]) - 1) and item_end_range != len(player.bag):
+                        item_start_range += 1
+                        item_end_range += 1
+                    elif keypress == curses.KEY_BACKSPACE or keypress == 8:
+                        mode = "Start"
+                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
+                        pass
         # computer's turn
         else:
-            if attack_prompts(stdscr, 17, w, "Wild", pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + start_range], False):
-                if defeated_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + start_range], pythomon_target, "Wild"):
+            if attack_prompts(stdscr, 17, w, "Wild", pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + pytho_start_range], False):
+                if defeated_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], pythomon_target, "Wild"):
                     print_gameover(stdscr, h, w)
                     curses.curs_set(1)
                     curses.endwin()
