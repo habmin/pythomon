@@ -330,7 +330,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                             mode = "CPU"
 
             # Initial start of encounter mode
-            if mode == "Start" or mode == "Select Pythomon" or mode == "Item":
+            if mode == "Start" or mode == "Select Pythomon" or mode == "Item" or mode == "Heal":
                 # Print initial menu
                 print_menu_1(stdscr, 19, 5, init_menu, init_selection)
                 
@@ -342,10 +342,10 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         init_selection += 1
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Fight":
                         mode = "Select Pythomon"
-                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Run":
-                        break
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Item":
                         mode = "Item"
+                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Run":
+                        break
 
                 elif mode == "Select Pythomon":
                     # select from player's pythomon roster
@@ -403,7 +403,68 @@ def encounter(stdscr, h, w, player, pythomon_target):
                     elif keypress == curses.KEY_BACKSPACE or keypress == 8:
                         mode = "Start"
                     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
-                        pass
+                        mode = "Heal"
+                
+                elif mode == "Heal":
+
+                    stdscr.addstr(19, 15, ">")
+                    for i, item in enumerate(player.bag[item_start_range:min(item_end_range, item_max_range)]):
+                        blank_space = ' ' * (16 - len(item))
+                        if i == item_selection:
+                            stdscr.attron(curses.color_pair(1))
+                            stdscr.addstr((19) + i, 20, item)
+                            stdscr.attroff(curses.color_pair(1))
+                        else:
+                            stdscr.addstr((19) + i, 20, item)
+                    
+                    stdscr.addstr(19, 39, ">")
+                    health_selection = 0
+                    if player.bag[item_selection + item_start_range] == "Revive":
+                        damaged_pythomon = list(filter(lambda pythomon: pythomon.status == "dead", player.pythomon))
+                    else:
+                        damaged_pythomon = list(filter(lambda pythomon: pythomon.hp < pythomon.max_hp and pythomon.status == "alive", player.pythomon))
+                    damaged_start_range = 0
+                    damaged_end_range = damaged_start_range + min(len(damaged_pythomon), 4)
+                    damaged_max_range = len(damaged_pythomon)
+                    if len(damaged_pythomon) == 0:
+                        stdscr.attron(curses.color_pair(1))
+                        if player.bag[item_selection + item_start_range] == "Revive":
+                            stdscr.addstr(19, 42, "All Pythomon are alive")
+                        else:
+                            stdscr.addstr(19, 42, "All Pythomon are at MAX HP")
+                        stdscr.attroff(curses.color_pair(1))
+                    else:
+                        for i, option in enumerate(damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)]):
+                            blank_space = ' ' * (16 - len(option.name))
+                            if i == health_selection:
+                                stdscr.attron(curses.color_pair(1))
+                                stdscr.addstr((19) + i, 42, f"{option.name}{blank_space}HP:{option.hp}/{option.max_hp}")
+                                stdscr.attroff(curses.color_pair(1))
+                            else:
+                                stdscr.addstr((19) + i, 42, f"{option.name}{blank_space}HP:{option.hp}/{option.max_hp}")
+                    
+                    keypress = stdscr.getch()  
+                    
+                    if keypress == curses.KEY_UP and health_selection > damaged_start_range:
+                        health_selection -= 1
+                    elif keypress == curses.KEY_UP and health_selection == damaged_start_range and health_selection > 0:
+                        damaged_start_range -= 1
+                        damaged_end_range -= 1
+                    elif keypress == curses.KEY_DOWN and health_selection < (len(damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)]) - 1):
+                        health_selection += 1
+                    elif keypress == curses.KEY_DOWN and health_selection == (len(damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)]) - 1) and damaged_end_range != len(damaged_pythomon):
+                        damaged_start_range += 1
+                        damaged_end_range += 1
+                    elif keypress == curses.KEY_BACKSPACE or keypress == 8:
+                        mode = "Item"
+                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
+                        if player.bag[item_selection + item_start_range] == "Revive":
+                            damaged_pythomon[health_selection + damaged_start_range].revive()
+                        elif player.bag[item_selection + item_start_range] == "Health Spray":
+                            damaged_pythomon[health_selection + damaged_start_range].heal(20)
+                        else:
+                            damaged_pythomon[health_selection + damaged_start_range].heal(50)
+                        player.bag.pop(item_selection + item_start_range)
         # computer's turn
         else:
             if attack_prompts(stdscr, 17, w, "Wild", pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + pytho_start_range], False):

@@ -7,11 +7,11 @@ class Player:
         self.name = name
         self.money = 100
         self.pythomon = [starter]
-        self.bag = ["Health Spray", "Health Spray", "Health Spray", "Capture Ball", "Capture Ball", "Capture Ball"]
+        self.bag = ["Health Spray", "Health Spray", "Health Spray", "Revive", "Capture Ball", "Capture Ball", "Capture Ball"]
         self.gender = gender
         self.nature = nature
         self.defeated = False
-        # self.pythomon.append(Pythomon(pythodeck[1]))
+        self.pythomon.append(Pythomon(pythodeck[1]))
         # self.pythomon.append(Pythomon(pythodeck[2]))
         # self.pythomon.append(Pythomon(pythodeck[3]))
         # self.pythomon.append(Pythomon(pythodeck[4]))
@@ -61,6 +61,13 @@ class Pythomon:
             target.status = "dead"
             return True
         return False
+    
+    def heal(self, hp_amount):
+        self.hp = min(self.max_hp, self.hp + hp_amount)
+    
+    def revive(self):
+        self.status = "alive"
+        self.hp = self.max_hp // 2
         
 class Trainer:
     def __init__(self, name, pythomon, money, prize, about, flair):
