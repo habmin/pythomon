@@ -77,6 +77,10 @@ def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target, players_turn
     return did_defeat
 
 def level_up_prompt(stdscr, h, w, player, players_pythomon, encounter):
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    stdscr.addstr(h, 5, f"{players_pythomon.name} gained {encounter.exp_prize} EXP!")
+    stdscr.refresh()
+    time.sleep(2)
     if players_pythomon.level_up(encounter.exp_prize):
         stdscr.addstr(h, 0, f"{' ' * w}")
         stdscr.addstr(h, 5, f"{players_pythomon.name} leveled up! Gained 3 MAX HP and ATK")
@@ -106,10 +110,6 @@ def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_own
     player.money += encounter.money_prize
     stdscr.refresh()
     time.sleep(2)
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    stdscr.addstr(h, 5, f"{players_pythomon.name} gained {encounter.exp_prize} EXP!")
-    stdscr.refresh()
-    time.sleep(2)
     level_up_prompt(stdscr, h, player, players_pythomon, encounter, encounter_owner)
 
 def capture_prompts(stdscr, h, w, player, players_pythomon, item_idx, encounter, encounter_owner, engaged):
@@ -124,24 +124,27 @@ def capture_prompts(stdscr, h, w, player, players_pythomon, item_idx, encounter,
         stdscr.refresh()
         time.sleep(2)
     else:
+        player.bag.pop(item_idx)
         stdscr.addstr(h, 0, f"{' ' * w}")
         stdscr.addstr(h, 5, f"Attempted to capture Wild {encounter.name}!")
         stdscr.refresh()
         time.sleep(2)
-        if encounter.hp <= encounter.hp / 4:
+        if encounter.hp <= encounter.max_hp * 0.4:
             # success
             print_pythomon(stdscr, 3, 50, encounter, False, True)
+            player.pythomon.append(encounter)
             stdscr.addstr(h, 0, f"{' ' * w}")
             stdscr.addstr(h, 5, f"You caught {encounter.name}!")
             stdscr.refresh()
             time.sleep(2)
-            level_up_prompt(stdscr, h, w, player, players_pythomon, encounter, encounter_owner)
+            level_up_prompt(stdscr, h, w, player, players_pythomon, encounter)
+            return True
         else:
             stdscr.addstr(h, 0, f"{' ' * w}")
             stdscr.addstr(h, 5, f"{encounter.name} managed to escape!")
             stdscr.refresh()
             time.sleep(2)
-        player.bag.pop(item_idx)
+    return False
 
 
         
