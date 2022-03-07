@@ -198,6 +198,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
     pytho_start_range = 0
     pytho_end_range = pytho_start_range + min(len(player.pythomon), 4)
     pytho_max_range = len(player.pythomon)
+    pytho_select_index = 0
     item_start_range = 0
     item_end_range = item_start_range + min(len(player.bag), 4)
     item_max_range = len(player.bag)
@@ -213,7 +214,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
         
         # Print player's pythomon once selected/deployed
         if deployed:
-            print_pythomon(stdscr, 3, 5, player.pythomon[pythodeck_selection + pytho_start_range], True, False)
+            print_pythomon(stdscr, 3, 5, player.pythomon[pytho_select_index], True, False)
 
         # Players turn
         if turn % 2 == 1:
@@ -236,15 +237,17 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Run":
                     break
 
-            elif mode == "Select Pythomon":
+            elif mode == "Select Pythomon" or mode == "Switch":
                 # Print initial menu
-                print_menu_1(stdscr, 19, 5, init_menu, init_selection)
+                if mode == "Select Pythomon":
+                    print_menu_1(stdscr, 19, 5, init_menu, init_selection)
+                else:
+                    print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
 
-                # select from player's pythomon roster
                 print_menu_select_pythomon(stdscr, 19, 20, player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)], pythodeck_selection)
 
                 keypress = stdscr.getch()    
-            
+
                 if keypress == curses.KEY_UP and pythodeck_selection > pytho_start_range:
                     pythodeck_selection -= 1
                 elif keypress == curses.KEY_UP and pythodeck_selection == pytho_start_range and pythodeck_selection > 0:
@@ -256,10 +259,15 @@ def encounter(stdscr, h, w, player, pythomon_target):
                     pytho_start_range += 1
                     pytho_end_range += 1
                 elif keypress == curses.KEY_BACKSPACE or keypress == 8:
-                    mode = "Start"
+                    if mode == "Select Pythomon":
+                        mode = "Start"
+                    else:
+                        mode = "Engaged"
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and player.pythomon[pythodeck_selection + pytho_start_range].status == "alive":
+                    pytho_select_index = pythodeck_selection + pytho_start_range
                     deployed = True
                     mode = "Engaged"
+
                 
             elif mode == "Start-Item" or mode == "Engaged-Item":
                 # Print initial menu
@@ -376,7 +384,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Item":
                     mode = "Engaged-Item"
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Switch":
-                    pass
+                    mode = "Switch"
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Run":
                     break
                 
@@ -411,84 +419,6 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         turn += 1
                         mode = "CPU"
             
-            # elif mode == "Engaged-Item":
-            #     # Print engaged menu
-            #     print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
-
-            #     stdscr.addstr(19, 15, ">")
-            #     if len(player.bag) == 0:
-            #         stdscr.attron(curses.color_pair(1))
-            #         stdscr.addstr(19, 20, "No Items")
-            #         stdscr.attroff(curses.color_pair(1))
-            #     else:
-            #         print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection)
-    
-            #     keypress = stdscr.getch()    
-            
-            #     if keypress == curses.KEY_UP and item_selection > item_start_range:
-            #         item_selection -= 1
-            #     elif keypress == curses.KEY_UP and item_selection == item_start_range and item_selection > 0:
-            #         item_start_range -= 1
-            #         item_end_range -= 1
-            #     elif keypress == curses.KEY_DOWN and item_selection < (len(player.bag[item_start_range:min(item_end_range, item_max_range)]) - 1):
-            #         item_selection += 1
-            #     elif keypress == curses.KEY_DOWN and item_selection == (len(player.bag[item_start_range:min(item_end_range, item_max_range)]) - 1) and item_end_range != len(player.bag):
-            #         item_start_range += 1
-            #         item_end_range += 1
-            #     elif keypress == curses.KEY_BACKSPACE or keypress == 8:
-            #         mode = "Engaged"
-            #     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
-            #         if player.bag[item_selection + item_start_range] == "Capture Ball":
-            #             if capture_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], item_selection + item_start_range, pythomon_target, "Wild", True):
-            #                 break
-            #         else:
-            #             mode == "Engaged-Heal"
-            
-            # elif mode == "Engaged-Heal":
-            #     if player.bag[item_selection + item_start_range] == "Revive":
-            #         damaged_pythomon = list(filter(lambda pythomon: pythomon.status == "dead", player.pythomon))
-            #     else:
-            #         damaged_pythomon = list(filter(lambda pythomon: pythomon.hp < pythomon.max_hp and pythomon.status == "alive", player.pythomon))
-            #     damaged_start_range = 0
-            #     damaged_end_range = damaged_start_range + min(len(damaged_pythomon), 4)
-            #     damaged_max_range = len(damaged_pythomon)
-                
-            #     # print engaged menu
-            #     print_menu_1(stdscr, 19, 5, init_menu, init_selection)
-            #     # print item menu
-            #     stdscr.addstr(19, 15, ">")
-            #     print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection)
-            #     # print heal menu
-            #     stdscr.addstr(19, 37, ">")
-            #     print_heal_menu(stdscr, 19, 42, damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)], health_selection, damaged_start_range, damaged_end_range, damaged_max_range, player.bag[item_selection + item_start_range])
-                
-            #     keypress = stdscr.getch()  
-                
-            #     if keypress == curses.KEY_UP and health_selection > damaged_start_range:
-            #         health_selection -= 1
-            #     elif keypress == curses.KEY_UP and health_selection == damaged_start_range and health_selection > 0:
-            #         damaged_start_range -= 1
-            #         damaged_end_range -= 1
-            #     elif keypress == curses.KEY_DOWN and health_selection < (len(damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)]) - 1):
-            #         health_selection += 1
-            #     elif keypress == curses.KEY_DOWN and health_selection == (len(damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)]) - 1) and damaged_end_range != len(damaged_pythomon):
-            #         damaged_start_range += 1
-            #         damaged_end_range += 1
-            #     elif keypress == curses.KEY_BACKSPACE or keypress == 8:
-            #         mode = "Engaged-Item"
-            #     elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and len(damaged_pythomon) > 0:
-            #         if player.bag[item_selection + item_start_range] == "Revive":
-            #             damaged_pythomon[health_selection + damaged_start_range].revive()
-            #         elif player.bag[item_selection + item_start_range] == "Health Spray":
-            #             damaged_pythomon[health_selection + damaged_start_range].heal(20)
-            #         else:
-            #             damaged_pythomon[health_selection + damaged_start_range].heal(50)
-            #         player.bag.pop(item_selection + item_start_range)
-            #         item_start_range = 0
-            #         item_end_range = item_start_range + min(len(player.bag), 4)
-            #         item_max_range = len(player.bag)
-            #         turn += 1
-            #         mode = "CPU"
         # computer's turn
         else:
             if attack_prompts(stdscr, 17, w, "Wild", pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + pytho_start_range], False):
