@@ -18,6 +18,37 @@ def print_menu_1(stdscr, h, w, menu, selection):
         else:
             stdscr.addstr(h + i, w, option)
 
+def print_menu_select_pythomon(stdscr, h, w, menu, selection):
+    stdscr.addstr(h, w - 5, ">")
+    for i, option in enumerate(menu):
+        blank_space = ' ' * (16 - len(option.name))
+        if i == selection:
+            stdscr.attron(curses.color_pair(1))
+            stdscr.addstr(h + i, w, f"{option.name}{blank_space}HP:{option.hp}/{option.max_hp}")
+            stdscr.attroff(curses.color_pair(1))
+        else:
+            stdscr.addstr(h + i, w, f"{option.name}{blank_space}HP:{option.hp}/{option.max_hp}")
+
+def print_menu_center(stdscr, h, w, menu, selection):
+    for i, option in enumerate(menu):
+        if i == selection:
+            stdscr.attron(curses.color_pair(1))
+            stdscr.addstr(h + i, ((w // 2) - (len(option) // 2)), option)
+            stdscr.attroff(curses.color_pair(1))
+        else:
+            stdscr.addstr(h + i, ((w // 2) - (len(option) // 2)), option)
+
+def print_heal_menu(stdscr, h, w, h_menu, h_selection, h_start, h_end, h_max, item):
+    if len(h_menu) == 0:
+        stdscr.attron(curses.color_pair(1))
+        if item == "Revive":
+            stdscr.addstr(h, w, "All Pythomon are alive")
+        else:
+            stdscr.addstr(h, w, "All Pythomon are at MAX HP")
+        stdscr.attroff(curses.color_pair(1))
+    else:
+        print_menu_select_pythomon(stdscr, h, w, h_menu[h_start:min(h_end, h_max)], h_selection)
+
 def print_pythomon(stdscr, h, w, pythomon, player_ownership, dead):
     for i, line in enumerate(pythomon.art):
         if dead:
@@ -45,21 +76,7 @@ def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target, players_turn
     time.sleep(2)
     return did_defeat
 
-def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_owner):
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    print_pythomon(stdscr, 3, 50, encounter, False, True)
-    stdscr.addstr(h, 5, f"{player.name} defeated {encounter_owner} {encounter.name}!")
-    stdscr.refresh()
-    time.sleep(2)
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    stdscr.addstr(h, 5, f"You gained ${encounter.money_prize}!")
-    player.money += encounter.money_prize
-    stdscr.refresh()
-    time.sleep(2)
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    stdscr.addstr(h, 5, f"{players_pythomon.name} gained {encounter.exp_prize} EXP!")
-    stdscr.refresh()
-    time.sleep(2)
+def level_up_prompt(stdscr, h, w, player, players_pythomon, encounter):
     if players_pythomon.level_up(encounter.exp_prize):
         stdscr.addstr(h, 0, f"{' ' * w}")
         stdscr.addstr(h, 5, f"{players_pythomon.name} leveled up! Gained 3 MAX HP and ATK")
@@ -78,6 +95,57 @@ def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_own
             stdscr.refresh()
             time.sleep(2)
 
+def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_owner):
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    print_pythomon(stdscr, 3, 50, encounter, False, True)
+    stdscr.addstr(h, 5, f"{player.name} defeated {encounter_owner} {encounter.name}!")
+    stdscr.refresh()
+    time.sleep(2)
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    stdscr.addstr(h, 5, f"You gained ${encounter.money_prize}!")
+    player.money += encounter.money_prize
+    stdscr.refresh()
+    time.sleep(2)
+    stdscr.addstr(h, 0, f"{' ' * w}")
+    stdscr.addstr(h, 5, f"{players_pythomon.name} gained {encounter.exp_prize} EXP!")
+    stdscr.refresh()
+    time.sleep(2)
+    level_up_prompt(stdscr, h, player, players_pythomon, encounter, encounter_owner)
+
+def capture_prompts(stdscr, h, w, player, players_pythomon, item_idx, encounter, encounter_owner, engaged):
+    if not engaged:
+        stdscr.addstr(h, 0, f"{' ' * w}")
+        stdscr.addstr(h, 5, "Must engaged in battle first!")
+        stdscr.refresh()
+        time.sleep(2)
+    elif encounter_owner != "Wild":
+        stdscr.addstr(h, 0, f"{' ' * w}")
+        stdscr.addstr(h, 5, "Can only use on Wild Pythomon!")
+        stdscr.refresh()
+        time.sleep(2)
+    else:
+        stdscr.addstr(h, 0, f"{' ' * w}")
+        stdscr.addstr(h, 5, f"Attempted to capture Wild {encounter.name}!")
+        stdscr.refresh()
+        time.sleep(2)
+        if encounter.hp <= encounter.hp / 4:
+            # success
+            print_pythomon(stdscr, 3, 50, encounter, False, True)
+            stdscr.addstr(h, 0, f"{' ' * w}")
+            stdscr.addstr(h, 5, f"You caught {encounter.name}!")
+            stdscr.refresh()
+            time.sleep(2)
+            level_up_prompt(stdscr, h, w, player, players_pythomon, encounter, encounter_owner)
+        else:
+            stdscr.addstr(h, 0, f"{' ' * w}")
+            stdscr.addstr(h, 5, f"{encounter.name} managed to escape!")
+            stdscr.refresh()
+            time.sleep(2)
+        player.bag.pop(item_idx)
+
+
+        
+        
 def defeated_prompts(stdscr, h, w, player, defeated_pythomon, encounter, encounter_owner):
     print_pythomon(stdscr, 3, 5, defeated_pythomon, True, True)
     stdscr.addstr(h, 0, f"{' ' * w}")
