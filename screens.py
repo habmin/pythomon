@@ -1,5 +1,4 @@
 import curses
-from sys import stderr
 import time
 import random
 from classes import *
@@ -201,6 +200,7 @@ def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target, players_turn
 
 def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_owner):
     stdscr.addstr(h, 0, f"{' ' * w}")
+    print_pythomon(stdscr, 3, 50, encounter, False, True)
     stdscr.addstr(h, 5, f"{player.name} defeated {encounter_owner} {encounter.name}!")
     stdscr.refresh()
     time.sleep(2)
@@ -276,11 +276,11 @@ def encounter(stdscr, h, w, player, pythomon_target):
     while pythomon_target.hp > 0:
         stdscr.clear()
 
-        # Always print encountered pythomon
+        # print encountered pythomon until dead
         print_pythomon(stdscr, 3, 50, pythomon_target, False, False)
         
+        # Print player's pythomon once selected/deployed
         if deployed:
-            # Print player's pythomon
             print_pythomon(stdscr, 3, 5, player.pythomon[pythodeck_selection + pytho_start_range], True, False)
 
         if turn % 2 == 1:
@@ -379,15 +379,8 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 
                 elif mode == "Item":
                     stdscr.addstr(19, 15, ">")
-                    for i, item in enumerate(player.bag[item_start_range:min(item_end_range, item_max_range)]):
-                        blank_space = ' ' * (16 - len(item))
-                        if i == item_selection:
-                            stdscr.attron(curses.color_pair(1))
-                            stdscr.addstr((19) + i, 20, item)
-                            stdscr.attroff(curses.color_pair(1))
-                        else:
-                            stdscr.addstr((19) + i, 20, item)
-                
+                    print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection)
+        
                     keypress = stdscr.getch()    
                 
                     if keypress == curses.KEY_UP and item_selection > item_start_range:
@@ -457,7 +450,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         damaged_end_range += 1
                     elif keypress == curses.KEY_BACKSPACE or keypress == 8:
                         mode = "Item"
-                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
+                    elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and len(damaged_pythomon) > 0:
                         if player.bag[item_selection + item_start_range] == "Revive":
                             damaged_pythomon[health_selection + damaged_start_range].revive()
                         elif player.bag[item_selection + item_start_range] == "Health Spray":
@@ -465,6 +458,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         else:
                             damaged_pythomon[health_selection + damaged_start_range].heal(50)
                         player.bag.pop(item_selection + item_start_range)
+                        mode = "Item"
         # computer's turn
         else:
             if attack_prompts(stdscr, 17, w, "Wild", pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + pytho_start_range], False):

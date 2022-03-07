@@ -1,8 +1,6 @@
-import curses
+from sys import platform
 import random
-import time
 from classes import *
-from screens import *
 
 def grid_maker(height, width, encounter_rate):
     # Create height by width grid and fill with Squares/Terrain
@@ -104,5 +102,15 @@ def main(stdscr):
     exit(0)
 
 if __name__ == "__main__":
+    try:
+        import curses
+        from screens import *
+    except ModuleNotFoundError:
+        if platform == "win32":
+            print("Module 'windows-curses' was not found, and is required to run pythomon. Use 'pip install windows-curses' to install module.")
+            exit(1)
+        else:
+            print("Module 'curses' was not found, and is required to run pythomon")
+            exit(1)
     curses.wrapper(main)
                                                         
