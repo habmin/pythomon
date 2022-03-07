@@ -2,24 +2,18 @@ from sys import platform
 import random
 from classes import *
 
-def grid_maker(height, width, encounter_rate):
+def grid_maker(height, width, encounter_rate, store_row, store_col, player_x, player_y):
     # Create height by width grid and fill with Squares/Terrain
     grid = [[Square("grass") for i in range(width)] for j in range(height)]
 
     # Player always starts in upper left
-    grid[0][0].player_occupied = True
+    grid[player_y][player_x].player_occupied = True
 
     # Trainer is always in bottom right
     grid[height - 1][width - 1].terrain = "trainer"
 
-    # Randomly place one store
-    random_store_row = random.randint(0, height - 1)
-    random_store_col = random.randint(0, width - 1)
-    # Make sure location is not the starting player position or Trainer position
-    while (random_store_row == 0 and random_store_col == 0) or (random_store_row == height - 1 and random_store_col == width - 1):
-        random_store_row = random.randint(0, height - 1)
-        random_store_col = random.randint(0, width - 1)
-    grid[random_store_row][random_store_col].terrain = "store"
+    # Place Store
+    grid[store_row][store_col].terrain = "store"
 
     # Make encounter_rate enemy encouter locations
     for i in range(encounter_rate):
@@ -29,6 +23,7 @@ def grid_maker(height, width, encounter_rate):
             random_row = random.randint(0, height - 1)
             random_col = random.randint(0, width - 1)
         grid[random_row][random_col].terrain = "encounter"
+
     return grid
 
 def main(stdscr):
@@ -52,21 +47,26 @@ def main(stdscr):
         grid_height = 15
         grid_width = 15
         encounter_rate = 20
-        grid = grid_maker(grid_height, grid_width, encounter_rate)
-
-        # Loop until player is defeated or wins
-        # while not player.defeated:
-        #     # print grid
+        # Player's coordinates
         player_x = 0
         player_y = 0
+        # Randomly place one store
+        store_row = random.randint(0, grid_height - 1)
+        store_col = random.randint(0, grid_width - 1)
+        # Make sure location is not the starting player position or Trainer position
+        while (store_row == player_y and store_col == player_x) or (store_row == grid_height - 1 and store_col == grid_width - 1):
+            store_row = random.randint(0, grid_height - 1)
+            store_col = random.randint(0, grid_width - 1)
+        
+        grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
+
         
         while not player.defeated:
             stdscr.clear()
 
             if grid[player_y][player_x].terrain == "encounter":
                 encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]))
-                #encounter(stdscr, height, width, player, Pythomon(pythodeck[24]))
-                # grid[player_y][player_x].terrain = "grass"
+                grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
                 stdscr.clear()
             
             elif grid[player_y][player_x].terrain == "store":

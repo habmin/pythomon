@@ -226,7 +226,10 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 print_menu_1(stdscr, 19, 5, init_menu, init_selection)
                 
                 keypress = stdscr.getch()
-                if keypress == curses.KEY_UP and init_selection > 0:
+                if keypress == ord('q'):
+                    quit_prompt(stdscr)
+
+                elif keypress == curses.KEY_UP and init_selection > 0:
                     init_selection -= 1
                 elif keypress == curses.KEY_DOWN and init_selection < (len(init_menu) - 1):
                     init_selection += 1
@@ -246,9 +249,11 @@ def encounter(stdscr, h, w, player, pythomon_target):
 
                 print_menu_select_pythomon(stdscr, 19, 20, player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)], pythodeck_selection)
 
-                keypress = stdscr.getch()    
+                keypress = stdscr.getch()
+                if keypress == ord('q'):
+                    quit_prompt(stdscr)   
 
-                if keypress == curses.KEY_UP and pythodeck_selection > pytho_start_range:
+                elif keypress == curses.KEY_UP and pythodeck_selection > pytho_start_range:
                     pythodeck_selection -= 1
                 elif keypress == curses.KEY_UP and pythodeck_selection == pytho_start_range and pythodeck_selection > 0:
                     pytho_start_range -= 1
@@ -284,9 +289,11 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 else:
                     print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection)
     
-                keypress = stdscr.getch()    
+                keypress = stdscr.getch()
+                if keypress == ord('q'):
+                    quit_prompt(stdscr)     
             
-                if keypress == curses.KEY_UP and item_selection > item_start_range:
+                elif keypress == curses.KEY_UP and item_selection > item_start_range:
                     item_selection -= 1
                 elif keypress == curses.KEY_UP and item_selection == item_start_range and item_selection > 0:
                     item_start_range -= 1
@@ -335,9 +342,11 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 stdscr.addstr(19, 37, ">")
                 print_heal_menu(stdscr, 19, 42, damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)], health_selection, damaged_start_range, damaged_end_range, damaged_max_range, player.bag[item_selection + item_start_range])
                 
-                keypress = stdscr.getch()  
-                
-                if keypress == curses.KEY_UP and health_selection > damaged_start_range:
+                keypress = stdscr.getch()
+                if keypress == ord('q'):
+                    quit_prompt(stdscr)     
+            
+                elif keypress == curses.KEY_UP and health_selection > damaged_start_range:
                     health_selection -= 1
                 elif keypress == curses.KEY_UP and health_selection == damaged_start_range and health_selection > 0:
                     damaged_start_range -= 1
@@ -375,7 +384,10 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
 
                 keypress = stdscr.getch()
-                if keypress == curses.KEY_UP and init_selection > 0:
+                if keypress == ord('q'):
+                    quit_prompt(stdscr)     
+            
+                elif keypress == curses.KEY_UP and init_selection > 0:
                     init_selection -= 1
                 elif keypress == curses.KEY_DOWN and init_selection < (len(engaged_menu) - 1):
                     init_selection += 1
@@ -402,8 +414,10 @@ def encounter(stdscr, h, w, player, pythomon_target):
                         stdscr.addstr((19) + i, 20, "{}{}POW:{}".format(option["name"], blank_space, option["power"]))
 
                 keypress = stdscr.getch()
-
-                if keypress == curses.KEY_UP and moves_selection > 0:
+                if keypress == ord('q'):
+                    quit_prompt(stdscr)     
+            
+                elif keypress == curses.KEY_UP and moves_selection > 0:
                     moves_selection -= 1
                 elif keypress == curses.KEY_DOWN and moves_selection < (len(player.pythomon[pythodeck_selection + pytho_start_range].moves) - 1):
                     moves_selection += 1
