@@ -4,7 +4,7 @@ from classes import *
 
 def grid_maker(height, width, encounter_rate):
     # Create height by width grid and fill with Squares/Terrain
-    grid = [[Square("grass") for i in range(height)] for j in range(width)]
+    grid = [[Square("grass") for i in range(width)] for j in range(height)]
 
     # Player always starts in upper left
     grid[0][0].player_occupied = True
@@ -41,61 +41,64 @@ def main(stdscr):
     # 2: Yellow Font, Blue Background (for Start Screen)
     curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLUE)
 
-    # Start Splash Screen
-    start_screen(stdscr, height, width)
+    while True:
+        # Start Splash Screen
+        start_screen(stdscr, height, width)
 
-    # Create Player
-    player = create_player(stdscr, height, width)
+        # Create Player
+        player = create_player(stdscr, height, width)
 
-    # Create grid
-    grid_height = 10
-    grid_width = 10
-    encounter_rate = 10
-    grid = grid_maker(grid_height, grid_width, encounter_rate)
+        # Create grid
+        grid_height = 15
+        grid_width = 15
+        encounter_rate = 20
+        grid = grid_maker(grid_height, grid_width, encounter_rate)
 
-    # Loop until player is defeated or wins
-    # while not player.defeated:
-    #     # print grid
-    player_x = 0
-    player_y = 0
-    
-    while not player.defeated:
-        stdscr.clear()
-
-        if grid[player_y][player_x].terrain == "encounter":
-            encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]))
-            # encounter(stdscr, height, width, player, Pythomon(pythodeck[24]))
-            grid[player_y][player_x].terrain = "grass"
-            stdscr.clear()
+        # Loop until player is defeated or wins
+        # while not player.defeated:
+        #     # print grid
+        player_x = 0
+        player_y = 0
         
-        elif grid[player_y][player_x].terrain == "store":
+        while not player.defeated:
             stdscr.clear()
 
-        elif grid[player_y][player_x].terrain == "trainer":
-            stdscr.clear()
+            if grid[player_y][player_x].terrain == "encounter":
+                encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]))
+                #encounter(stdscr, height, width, player, Pythomon(pythodeck[24]))
+                # grid[player_y][player_x].terrain = "grass"
+                stdscr.clear()
+            
+            elif grid[player_y][player_x].terrain == "store":
+                stdscr.clear()
 
-        print_grid(stdscr, height, width, grid)
+            elif grid[player_y][player_x].terrain == "trainer":
+                stdscr.clear()
 
-        keypress = stdscr.getch()
-        if keypress == curses.KEY_LEFT and not player_x == 0:
-            grid[player_y][player_x].player_occupied = False
-            player_x -= 1
-            grid[player_y][player_x].player_occupied = True
-        elif keypress == curses.KEY_RIGHT and not player_x == grid_width - 1:
-            grid[player_y][player_x].player_occupied = False
-            player_x += 1
-            grid[player_y][player_x].player_occupied = True
-        elif keypress == curses.KEY_UP and not player_y == 0:
-            grid[player_y][player_x].player_occupied = False
-            player_y -= 1
-            grid[player_y][player_x].player_occupied = True
-        elif keypress == curses.KEY_DOWN and not player_y == grid_height - 1:
-            grid[player_y][player_x].player_occupied = False
-            player_y += 1
-            grid[player_y][player_x].player_occupied = True    
+            print_grid(stdscr, height, width, grid, player)
+
+            keypress = stdscr.getch()
+            if keypress == curses.KEY_LEFT and not player_x == 0:
+                grid[player_y][player_x].player_occupied = False
+                player_x -= 1
+                grid[player_y][player_x].player_occupied = True
+            elif keypress == curses.KEY_RIGHT and not player_x == grid_width - 1:
+                grid[player_y][player_x].player_occupied = False
+                player_x += 1
+                grid[player_y][player_x].player_occupied = True
+            elif keypress == curses.KEY_UP and not player_y == 0:
+                grid[player_y][player_x].player_occupied = False
+                player_y -= 1
+                grid[player_y][player_x].player_occupied = True
+            elif keypress == curses.KEY_DOWN and not player_y == grid_height - 1:
+                grid[player_y][player_x].player_occupied = False
+                player_y += 1
+                grid[player_y][player_x].player_occupied = True
+            elif keypress == ord('q'):
+                quit_prompt(stdscr)
+
+            stdscr.refresh()
         
-        stdscr.refresh()
-    
     # Done with game, reset curs_set and end
     curses.curs_set(1)
     curses.endwin()

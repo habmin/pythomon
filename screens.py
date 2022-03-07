@@ -45,11 +45,21 @@ def start_screen(stdscr, h, w):
         elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "New Game":
             break
         elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Quit":
+            curses.curs_set(1)
+            curses.endwin()
             exit(0)
         
         stdscr.refresh()
 
     return
+
+def quit_prompt(stdscr):
+    stdscr.addstr(0, 0, "Are you sure you want to Quit? Press 'y' to confirm, otherwise press any other key to cancel")
+    keypress = stdscr.getch()
+    if keypress == ord('y'):
+        curses.curs_set(1)
+        curses.endwin()
+        exit(0)
 
 def create_player(stdscr, h, w):
     title = "Create your trainer"
@@ -113,7 +123,7 @@ def create_player(stdscr, h, w):
             selection += 1
         elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Finish":
             return Player(Pythomon(pythodeck[starter_selection]),player_name_buffer, player_gender_buffer, player_trait_buffer)
-        
+
         # Input handlers
         elif menu[selection] == "Trainer's Name":
             if keypress >= 32 and keypress <= 126 and len(player_name_buffer) <= 15:
@@ -137,30 +147,34 @@ def create_player(stdscr, h, w):
                 starter_selection = (starter_selection + 1) % 4
         stdscr.refresh()
 
-def print_grid(stdscr, h, w, grid):
+def print_grid(stdscr, h, w, grid, player):
     line = "═" * (3 * len(grid[0]))
-    stdscr.addstr(1, 1, f"╔{line}╗")
+    stdscr.addstr(0, 1, f"╔{line}╗")
     for i, row in enumerate(grid):
-        stdscr.addstr(2 + i, 1, "║")
+        stdscr.addstr(1 + i, 1, "║")
         for j, cell in enumerate(row):
             fill = "▒"
             if i % 2 == 0:
                 fill = "░"
             if cell.player_occupied:
-                stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}Y{fill}")
+                stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}Y{fill}")
             elif cell.terrain == "trainer":
-                stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}T{fill}")
+                stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}T{fill}")
             elif cell.terrain == "encounter":
-                stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}E{fill}")
+                stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}E{fill}")
             elif cell.terrain == "store":
-                stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}${fill}")
+                stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}${fill}")
             else:
                 if fill == "▒":
-                    stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}░{fill}")
+                    stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}░{fill}")
                 else:
-                    stdscr.addstr(2 + i, 2 + (3 * j), f"{fill}▒{fill}")
-        stdscr.addstr(2 + i, 2 + (3 * (j + 1)), "║")
-    stdscr.addstr(len(grid) + 2, 1, f"╚{line}╝")
+                    stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}▒{fill}")
+        stdscr.addstr(1 + i, 2 + (3 * (j + 1)), "║")
+    stdscr.addstr(len(grid) + 1, 1, f"╚{line}╝")
+    stdscr.addstr(4, (3 * len(grid[0])) + 7, f"{player.name}")
+    stdscr.addstr(5, (3 * len(grid[0])) + 7, f"Money: ${player.money}")
+    stdscr.addstr(6, (3 * len(grid[0])) + 7, f"Pythomon: {len(list(filter(lambda pythomon: pythomon.hp > 0, player.pythomon)))}/{len(player.pythomon)}")
+    stdscr.addstr(7, (3 * len(grid[0])) + 7, "Press 'q' anytime to exit game")
 
 def print_menu_1(stdscr, h, w, menu, selection):
     for i, option in enumerate(menu):
@@ -256,7 +270,6 @@ def defeated_prompts(stdscr, h, w, player, defeated_pythomon, encounter, encount
     return False
 
 def encounter(stdscr, h, w, player, pythomon_target):
-    # 1. print encounter
     init_menu = ["Fight", "Item", "Run"]
     engaged_menu = ["Attack", "Item", "Switch", "Run"]
     moves_selection = 0
@@ -464,9 +477,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
             if attack_prompts(stdscr, 17, w, "Wild", pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + pytho_start_range], False):
                 if defeated_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], pythomon_target, "Wild"):
                     print_gameover(stdscr, h, w)
-                    curses.curs_set(1)
-                    curses.endwin()
-                    exit(0)
+                    return True
                 else:
                     deployed = False
                     mode = "Start"

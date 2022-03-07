@@ -11,7 +11,7 @@ class Player:
         self.gender = gender
         self.nature = nature
         self.defeated = False
-        self.pythomon.append(Pythomon(pythodeck[1]))
+        # self.pythomon.append(Pythomon(pythodeck[1]))
         # self.pythomon.append(Pythomon(pythodeck[2]))
         # self.pythomon.append(Pythomon(pythodeck[3]))
         # self.pythomon.append(Pythomon(pythodeck[4]))
@@ -22,6 +22,7 @@ class Player:
         for pytho in self.pythomon:
             if pytho.status == "alive":
                 return False
+        self.defeated = True
         return True
 
 class Pythomon:
@@ -95,11 +96,11 @@ class Store:
     def __init__(self):
         self.items = [
             {"name": "Health Spray",
-             "price": 20},
+             "price": 30},
             {"name": "Health Drink",
-             "price": 50},
+             "price": 60},
             {"name": "Capture Ball",
-             "price": 50},
+             "price": 60},
             {"name": "Revive",
              "price": 100}
         ]
