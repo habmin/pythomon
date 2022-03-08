@@ -45,7 +45,7 @@ def main(stdscr):
         # Create grid
         grid_height = 15
         grid_width = 15
-        encounter_rate = 20
+        encounter_rate = 22
         
         # create store
         store = Store()

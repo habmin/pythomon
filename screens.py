@@ -583,7 +583,7 @@ def trainer_battle(stdscr, h, w, player):
         battle(stdscr, h, w, player, pythomon, f"{trainer.name}'s", init_menu, engaged_menu)
 
     trainer.pythomon[len(trainer.pythomon) - 1].revive()
-    trainer.pythomon[len(trainer.pythomon) - 1].heal(pythomon[len(trainer.pythomon) - 1].max_hp)
+    trainer.pythomon[len(trainer.pythomon) - 1].heal(trainer.pythomon[len(trainer.pythomon) - 1].max_hp)
     player.pythomon.append(trainer.pythomon[len(trainer.pythomon) - 1])
     player.trophies.append(random_trophy)
     player.money += trainer.money
