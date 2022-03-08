@@ -19,11 +19,59 @@ gameover = [
     " \____/   \/   |______|_|  \_\ "
 ]
 
+congrats = [
+    "  ____ ___  _   _  ____ ____      _  _____ ____  _ ",
+    " / ___/ _ \| \ | |/ ___|  _ \    / \|_   _/ ___|| |",
+    "| |  | | | |  \| | |  _| |_) |  / _ \ | | \___ \| |",
+    "| |__| |_| | |\  | |_| |  _ <  / ___ \| |  ___) |_|",
+    " \____\___/|_| \_|\____|_| \_\/_/   \_\_| |____/(_)",
+]
+
 traits = ["Cheerful", "Serious", "Determined", 
           "Chaotic", "Cool-Headed", "Aggressive", 
           "Polite", "Naughty", "Smart", "Polemic", 
           "Lazy", "Shady", "Sleepy"]
 
+trainer_names = ["Kazue", "Tesfaye", "Gabriel", "Ekua",
+                 "Lili", "Renáta", "Ruta", "Dario",
+                 "Evgenia", "Arif", "Sigrid", "Taner",
+                 "Emine", "Wilbert", "Marcel", "Delara",
+                 "Jun", "Amaru", "Tadhg", "Herbert",
+                 "Artie", "Halle", "Alban", "Dashawn",
+                 "Troilus", "Gwem", "Lena", "Dai"]
+                
+about_blurbs = [
+    "Rubs their eyes more than they should",
+    "Thinks R2-D2 is a chump",
+    "Loves self help books but can't read",
+    "Has 32 cats",
+    "Favoruite fruit is lemon",
+    "Eats only spaghetti",
+    "Is going to die alone but is at peace with that",
+    "Wants to go to a country where they're the smallest person",
+    "Speaks morse code and dolphin",
+    "Once wrestled a giant squid",
+    "Has too many teeth",
+    "Attempting to train crows to pick up litter",
+    "Has the world's largest rubberband ball",
+    "Still has a blockbuster member card",
+    "Afraid of bubble wrap",
+    "Sleeps 7 minutes a day",
+    "Has a pet cow named Sally",
+    "Has crashed every car they owned",
+    "Think Santa Claus is a government psy op"
+    "Is just happy to be here",
+    "Wants to be the pope",
+    "Owns 20 typewriters",
+    "Was birthed in a vet office",
+    "Has 11 fingers, somewhere",
+    "Tried to eat a square watermelon",
+    "Is banned from Scotland",
+    "Has a very active myspace page",
+    "Saw a guy got struct by lightning once",
+    "Has to use a safety pin to get in and out of their house",
+    "Collects rocks from crime scenes"
+]
 pythodeck = [  
     # 0-3 are the starter pythomon
     {
@@ -34,7 +82,7 @@ pythodeck = [
         "moves": [{
             "name": "Electro",
             "power": 20}],
-        "exp_prize": 50,
+        "exp_prize": 100,
         "art": [
             "    ▒▒         ▒▒ ",
             "      ▒▒▒▒▒▒▒▒▒   ",
@@ -53,7 +101,7 @@ pythodeck = [
         "moves": [{
             "name": "Fire",
             "power": 20}],
-        "exp_prize": 50,
+        "exp_prize": 100,
         "art": [
             "         ▒▓▓▓▓▒   ",
             "         ▓▓▒▓▓▒▒  ",
@@ -72,7 +120,7 @@ pythodeck = [
         "moves": [{
             "name": "Flower",
             "power": 20}],
-        "exp_prize": 50,
+        "exp_prize": 100,
         "art": [
             "  ▒▒▒▒▒           ",
             " ▒▒▒▒▒▒▒▒▒▒       ",
@@ -91,7 +139,7 @@ pythodeck = [
         "moves": [{
             "name": "Water Gun",
             "power": 20}],
-        "exp_prize": 50,
+        "exp_prize": 100,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -503,4 +551,25 @@ pythodeck = [
             "     ▒▒▒▒▒▒▒▓▒▒▒  ",
             "     ▒▒▒▒    ▒▒▒  "
         ]}
+]
+
+trainer_art = [
+    "                              ",
+    "             █▓▓███           ",
+    "             ▓▒▓▒▓█▓          ",
+    "     ▓▓▒▒    ▓██▓█▓           ",
+    "     ▒▒▒▓█▓▓█▓▓███▒           ",
+    "           ███▓▓██▓▒  ▒█      ",
+    "           ▓██▓██▒█████▓      ",
+    "          ▓██▓▓██ █           ",
+    "          ▒██████▓▒█          ",
+    "            ▒▒██████▓         ",
+    "              █▓▓████▓▒       ",
+    "            ▒▓▓▓█  ▒███▓      ",
+    "           ▓▓▓▓▓     ▓███     ",
+    "         ▒████▓      ████     ",
+    "       ▓████▓        ████▒    ",
+    "     ▒█████▒        ▓████▓    ",
+    "     ▒███▓           ▓▓███▓▒  ",
+    "      ▒▒▒▒                    ",
 ]

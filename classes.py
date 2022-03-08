@@ -3,7 +3,7 @@ from assets import traits
 from assets import pythodeck
 
 class Player:
-    def __init__(self, starter, name = "Ashy", gender = "Male", nature = traits[0]):
+    def __init__(self, starter, trophy, name = "Ashy", gender = "Male", nature = traits[0], ):
         self.name = name
         self.money = 100
         self.pythomon = [starter]
@@ -11,6 +11,7 @@ class Player:
         self.gender = gender
         self.nature = nature
         self.defeated = False
+        self.trophies = [trophy]
         self.pythomon.append(Pythomon(pythodeck[1]))
         self.pythomon.append(Pythomon(pythodeck[2]))
         self.pythomon.append(Pythomon(pythodeck[3]))
@@ -73,20 +74,19 @@ class Pythomon:
     
     def heal(self, hp_amount):
         self.hp = min(self.max_hp, self.hp + hp_amount)
+        self.healthbar = ("█" * int(((self.hp / self.max_hp) * 20))) + ("░" * (20 - int(((self.hp / self.max_hp) * 20))))
     
     def revive(self):
         self.status = "alive"
         self.hp = self.max_hp // 2
         
 class Trainer:
-    def __init__(self, name, pythomon, money, prize, about, flair):
+    def __init__(self, name, pythomon, money, prize, about):
         self.name = name
         self.pythomon = pythomon
         self.money = money
         self.prize = prize
         self.about = about
-        # should be a dict of sayings/taunts when they win, lose
-        self.flair = flair
 
 class Square:
     def __init__(self, terrain):

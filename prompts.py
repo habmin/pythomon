@@ -110,7 +110,7 @@ def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_own
     player.money += encounter.money_prize
     stdscr.refresh()
     time.sleep(2)
-    level_up_prompt(stdscr, h, player, players_pythomon, encounter, encounter_owner)
+    level_up_prompt(stdscr, h, w, player, players_pythomon, encounter)
 
 def capture_prompts(stdscr, h, w, player, players_pythomon, item_idx, encounter, encounter_owner, engaged):
     if not engaged:

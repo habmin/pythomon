@@ -8,6 +8,9 @@ from assets import title
 from assets import gameover
 from assets import traits
 from assets import pythodeck
+from assets import trainer_names
+from assets import about_blurbs
+from assets import trainer_art
 
 def start_screen(stdscr, h, w):
     subtitle = "Pythomon! - A Python Battle Game!"
@@ -111,7 +114,7 @@ def create_player(stdscr, h, w):
         elif keypress == curses.KEY_DOWN and selection < (len(menu) - 1):
             selection += 1
         elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Finish":
-            return Player(Pythomon(pythodeck[starter_selection]),player_name_buffer, player_gender_buffer, player_trait_buffer)
+            return Player(Pythomon(pythodeck[starter_selection]), starter_selection, player_name_buffer, player_gender_buffer, player_trait_buffer)
 
         # Input handlers
         elif menu[selection] == "Trainer's Name":
@@ -187,9 +190,7 @@ def gameover(stdscr, h, w):
     stdscr.refresh()
     time.sleep(5)
 
-def encounter(stdscr, h, w, player, pythomon_target, target_owner):
-    init_menu = ["Fight", "Item", "Run"]
-    engaged_menu = ["Attack", "Item", "Switch", "Run"]
+def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engaged_menu):
     moves_selection = 0
     init_selection = 0
     item_selection = 0
@@ -373,10 +374,11 @@ def encounter(stdscr, h, w, player, pythomon_target, target_owner):
                     item_start_range = 0
                     item_end_range = item_start_range + min(len(player.bag), 4)
                     item_max_range = len(player.bag)
+                    stdscr.addstr(14, 5, f"HP: {player.pythomon[pytho_select_index]}")
                     if mode == "Start-Heal":
                         mode = "Start-Item"
                     else:
-                        print_pythomon(stdscr, 3, 5, player.pythomon[pythodeck_selection + pytho_start_range], True, False)
+                        print_pythomon(stdscr, 14, 5, player.pythomon[health_selection + damaged_start_range], True, False)
                         turn += 1
                         mode = "CPU"
             
@@ -449,8 +451,13 @@ def encounter(stdscr, h, w, player, pythomon_target, target_owner):
 
         stdscr.refresh()
     
-    # player was not defeated by encounter
+    # player was not defeated by battle
     return False
+
+def encounter(stdscr, h, w, player, pythomon_target, target_owner):
+    init_menu = ["Fight", "Item", "Run"]
+    engaged_menu = ["Attack", "Item", "Switch", "Run"]
+    battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engaged_menu)
 
 def print_store(stdscr, h, w, player, store):
 
@@ -483,7 +490,7 @@ def print_store(stdscr, h, w, player, store):
     not_enough = False
     while True:
         stdscr.clear()
-        
+
         greeting = "Welcome To The General Store!"
         heal_text = "We've automatically healed all of your alive pythomon!"
         money_text = f"You have ${player.money}"
@@ -540,5 +547,60 @@ def print_store(stdscr, h, w, player, store):
             else:
                 not_enough = True
 
-def trainer_battle(stdscr, h, w, player, trainer):
-    pass
+def print_trainer(stdscr, h, w, trainer):
+    for i, line in enumerate(trainer_art):
+        stdscr.addstr(i + 1, (w // 2) - (len(line)// 2), line)
+
+def trainer_battle(stdscr, h, w, player):
+    # create pythmodeck for trainer
+    trainers_pythomon = []
+    for i in range(len(player.trophies) + 1):
+        trainers_pythomon.append(Pythomon(pythodeck[random.randint(4, 23)]))
+    
+    # last pythomon is the prize from the original first 4
+    # select one that the player does not have yet
+    random_trophy = random.randint(0, 3)
+    if random_trophy in player.trophies:
+        random_trophy = random.randint(0, 3)
+    trainers_pythomon.append(Pythomon(pythodeck[random_trophy]))
+
+    # level up pythmon based on trophy amount
+    for pythomon in trainers_pythomon:
+        pythomon.base_atk += len(player.trophies) * 3
+        pythomon.max_hp += len(player.trophies) * 3
+        pythomon.hp = pythomon.max_hp
+
+    # create trainer
+    trainer = Trainer(trainer_names[random.randint(0, len(trainer_names) - 1)], trainers_pythomon, 100 * player.trophies, trainers_pythomon[len(trainers_pythomon) - 1], about_blurbs[random.randint(0, len(about_blurbs) - 1)])
+
+    print_trainer(stdscr, h, w, trainer)
+    incoming = f"Here comes {trainer.name}!!"
+    about = f"About: {trainer.about}"
+    battle_text = "Get ready for battle!"
+    stdscr.addstr(20, (w // 2) - (len(incoming)// 2), incoming)
+    stdscr.addstr(21, (w // 2) - (len(about)// 2), about)
+    stdscr.addstr(22, (w // 2) - (len(battle_text)// 2), battle_text)
+    stdscr.refresh()
+    time.sleep(4)
+
+    init_menu = ["Fight", "Item"]
+    engaged_menu = ["Attack", "Item", "Switch"]
+    for pythomon in trainer.pythomon:
+        battle(stdscr, h, w, player, pythomon, f"{trainer.name}'s", init_menu, engaged_menu)
+
+    trainer.pythomon[len(trainer.pythomon) - 1].revive()
+    trainer.pythomon[len(trainer.pythomon) - 1].heal(1000)
+    player.pythomon.append(trainer.pythomon[len(trainer.pythomon) - 1])
+    player.trophies.append(random_trophy)
+
+    stdscr.clear()
+
+    print_trainer(stdscr, h, w, trainer)
+    won = f"You beat {trainer.name}!!"
+    next_battle = "Get ready for the next trainer!"
+    stdscr.addstr(20, (w // 2) - (len(won)// 2), won)
+    stdscr.addstr(21, (w // 2) - (len(next_battle)// 2), next_battle)
+    stdscr.refresh()
+    time.sleep(4)
+    
+    return True
