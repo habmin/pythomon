@@ -59,17 +59,20 @@ def main(stdscr):
             store_col = random.randint(0, grid_width - 1)
         
         grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
-
         
+        # create store
+        store = Store()
+
         while not player.defeated:
             stdscr.clear()
 
             if grid[player_y][player_x].terrain == "encounter":
-                encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]))
+                encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]), "Wild")
                 grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
                 stdscr.clear()
             
             elif grid[player_y][player_x].terrain == "store":
+                print_store(stdscr, height, width, player, store)
                 stdscr.clear()
 
             elif grid[player_y][player_x].terrain == "trainer":

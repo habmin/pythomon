@@ -25,6 +25,14 @@ class Player:
         self.defeated = True
         return True
 
+    def buy(self, item):
+        if self.money < item["price"]:
+            return False
+        else:
+            self.bag.append(item["name"])
+            self.money -= item["price"]
+            return True
+
 class Pythomon:
     def __init__(self, pythodeck):
         self.name = pythodeck["name"]

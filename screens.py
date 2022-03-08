@@ -1,6 +1,7 @@
 import curses
 import time
 import random
+import math
 from classes import *
 from prompts import *
 from assets import title
@@ -186,7 +187,7 @@ def gameover(stdscr, h, w):
     stdscr.refresh()
     time.sleep(5)
 
-def encounter(stdscr, h, w, player, pythomon_target):
+def encounter(stdscr, h, w, player, pythomon_target, target_owner):
     init_menu = ["Fight", "Item", "Run"]
     engaged_menu = ["Attack", "Item", "Switch", "Run"]
     moves_selection = 0
@@ -311,9 +312,9 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
                     if player.bag[item_selection + item_start_range] == "Capture Ball":
                         if mode == "Start-Item":
-                            capture_prompts(stdscr, 17, w, player, None, item_selection + item_start_range, pythomon_target, "Wild", False)
+                            capture_prompts(stdscr, 17, w, player, None, item_selection + item_start_range, pythomon_target, target_owner, False)
                         else:
-                            if capture_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], item_selection + item_start_range, pythomon_target, "Wild", True):
+                            if capture_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], item_selection + item_start_range, pythomon_target, target_owner, True):
                                 break
                     else:
                         if mode == "Start-Item":
@@ -426,7 +427,7 @@ def encounter(stdscr, h, w, player, pythomon_target):
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
                     # Commence attack! Returns true if target is defeated
                     if attack_prompts(stdscr, 17, w, f"{player.name}'s", player.pythomon[pythodeck_selection + pytho_start_range], moves_selection, pythomon_target, True):
-                        win_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], pythomon_target, "Wild")
+                        win_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], pythomon_target, target_owner)
                         # exit encounter
                         break
                     else:
@@ -435,8 +436,8 @@ def encounter(stdscr, h, w, player, pythomon_target):
             
         # computer's turn
         else:
-            if attack_prompts(stdscr, 17, w, "Wild", pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + pytho_start_range], False):
-                if defeated_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], pythomon_target, "Wild"):
+            if attack_prompts(stdscr, 17, w, target_owner, pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + pytho_start_range], False):
+                if defeated_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], pythomon_target, target_owner):
                     gameover(stdscr, h, w)
                     return True
                 else:
@@ -450,3 +451,94 @@ def encounter(stdscr, h, w, player, pythomon_target):
     
     # player was not defeated by encounter
     return False
+
+def print_store(stdscr, h, w, player, store):
+
+    for pythomon in player.pythomon:
+        if pythomon.status == "alive":
+            pythomon.hp = pythomon.max_hp
+
+    player_inventory = {
+        "Health Spray": 0,
+        "Health Drink": 0,
+        "Revive": 0,
+        "Capture Ball": 0,
+    }
+    for item in player.bag: 
+        if item == "Health Spray":
+            player_inventory["Health Spray"] += 1
+        elif item == "Health Drink":
+            player_inventory["Health Drink"] += 1
+        elif item == "Revive":
+            player_inventory["Revive"] += 1
+        elif item == "Capture Ball":
+            player_inventory["Capture Ball"] += 1
+
+    menu = []
+    for item in store.items:
+        menu.append(item["name"])
+    menu.append("Leave")
+
+    selection = 0
+    not_enough = False
+    while True:
+        stdscr.clear()
+        
+        greeting = "Welcome To The General Store!"
+        heal_text = "We've automatically healed all of your alive pythomon!"
+        money_text = f"You have ${player.money}"
+        not_enough_money_text = "You don't have enough money!"
+        stdscr.addstr((h // 2) - 8, (w // 2) - (len(greeting) // 2), greeting)
+        stdscr.addstr((h // 2) - 7, (w // 2) - (len(heal_text) // 2), heal_text)
+        stdscr.addstr((h // 2) - 6, 0, f"{' ' * w}")
+        stdscr.addstr((h // 2) - 6, (w // 2) - (len(money_text) // 2), money_text)
+        if not_enough:
+            stdscr.addstr((h // 2) - 4, (w // 2) - (len(not_enough_money_text) // 2), not_enough_money_text)
+
+        line = "═" * (w - 2)
+        stdscr.addstr(0, 0, f"╔{line}╗")
+        for i in range(h - 3):
+            stdscr.addstr(i + 1, 0, "║")
+            stdscr.addstr(i + 1, w - 1, "║")
+        stdscr.addstr(h - 2, 0, f"╚{line}╝")
+
+        for i, item in enumerate(menu):
+            if i != len(menu) - 1:
+                blank_space = ' ' * (16 - len(store.items[i]["name"]))
+            if i == selection:
+                stdscr.attron(curses.color_pair(1))
+                if i != len(menu) - 1:
+                    stdscr.addstr((h // 2) + i, (w // 4) - 10, "{}{}${}".format(store.items[i]["name"], blank_space, store.items[i]["price"]))
+                else:
+                    stdscr.addstr((h // 2) + i + 1, (w // 4) - 10, item)
+                stdscr.attroff(curses.color_pair(1))
+            else:
+                if i != len(menu) - 1:
+                    stdscr.addstr((h // 2) + i, (w // 4) - 10, "{}{}${}".format(store.items[i]["name"], blank_space, store.items[i]["price"]))
+                else:
+                    stdscr.addstr((h // 2) + i + 1, (w // 4) - 10, item)
+
+        stdscr.addstr((h // 2) - 2,  math.floor(w * .62), "Your inventory")
+        for i, (key, value) in enumerate(player_inventory.items()):
+            blank_space = ' ' * (12 - len(key))
+            stdscr.addstr((h // 2) + i, math.floor(w * .62), f"{key}{blank_space} X {value}")
+
+        keypress = stdscr.getch()
+        if keypress == ord('q'):
+            quit_prompt(stdscr)
+
+        elif keypress == curses.KEY_UP and selection > 0:
+            selection -= 1
+        elif keypress == curses.KEY_DOWN and selection < (len(menu) - 1):
+            selection += 1
+        elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Leave":
+            break
+        elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
+            if player.buy(store.items[selection]):
+                not_enough = False
+                player_inventory[store.items[selection]["name"]] += 1
+            else:
+                not_enough = True
+
+def trainer_battle(stdscr, h, w, player, trainer):
+    pass
