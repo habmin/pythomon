@@ -49,7 +49,7 @@ def main(stdscr):
         
         # create store
         store = Store()
-        while len(player.trophies) < 2:
+        while len(player.trophies) < 4:
             # Player's coordinates
             player_x = 0
             player_y = 0
