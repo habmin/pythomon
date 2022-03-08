@@ -7,19 +7,11 @@ class Player:
         self.name = name
         self.money = 100
         self.pythomon = [starter]
-        self.bag = ["Health Spray", "Health Spray", "Health Spray", "Revive", "Capture Ball", "Capture Ball", "Capture Ball", "Capture Ball", "Revive"]
+        self.bag = ["Health Spray", "Health Spray", "Health Spray", "Capture Ball"]
         self.gender = gender
         self.nature = nature
         self.defeated = False
         self.trophies = [trophy]
-        self.pythomon.append(Pythomon(pythodeck[1]))
-        self.pythomon.append(Pythomon(pythodeck[2]))
-        self.pythomon.append(Pythomon(pythodeck[3]))
-        self.pythomon.append(Pythomon(pythodeck[4]))
-        self.pythomon.append(Pythomon(pythodeck[5]))
-        self.pythomon.append(Pythomon(pythodeck[6]))
-        self.pythomon.append(Pythomon(pythodeck[7]))
-        self.pythomon.append(Pythomon(pythodeck[8]))
     
     def check_defeated(self):
         for pytho in self.pythomon:
@@ -84,7 +76,7 @@ class Pythomon:
         
 class Trainer:
     def __init__(self, name, pythomon, money, prize, about):
-        self.name = name
+        self.name = name    
         self.pythomon = pythomon
         self.money = money
         self.prize = prize
@@ -98,10 +90,6 @@ class Square:
     def __repr__(self) -> str:
         return f"{self.terrain} - Player occupied: {self.player_occupied}"
 
-class Item:
-    def __init__(self, name):
-        self.name
-
 class Store:
     def __init__(self):
         self.items = [
@@ -109,8 +97,8 @@ class Store:
              "price": 30},
             {"name": "Health Drink",
              "price": 60},
-            {"name": "Capture Ball",
-             "price": 60},
             {"name": "Revive",
-             "price": 100}
+             "price": 100},
+            {"name": "Capture Ball",
+             "price": 60}
         ]

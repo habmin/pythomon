@@ -53,7 +53,7 @@ def print_heal_menu(stdscr, h, w, h_menu, h_selection, h_start, h_end, h_max, it
 def print_pythomon(stdscr, h, w, pythomon, player_ownership, dead):
     for i, line in enumerate(pythomon.art):
         if dead:
-            stdscr.addstr(i + h, w, (' ' * 20))
+            stdscr.addstr(i + h, w, (' ' * len(line)))
         elif player_ownership:
             stdscr.addstr(i + h, w, line)
         else:

@@ -157,8 +157,8 @@ def print_grid(stdscr, h, w, grid, player):
                 stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}Y{fill}")
             elif cell.terrain == "trainer":
                 stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}T{fill}")
-            elif cell.terrain == "encounter":
-                stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}E{fill}")
+            # elif cell.terrain == "encounter":
+            #     stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}E{fill}")
             elif cell.terrain == "store":
                 stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}${fill}")
             # Choose grass type based on 'fill' type
@@ -311,7 +311,7 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                         mode = "Start"
                     else:
                         mode = "Engaged"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
+                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and len(player.bag) != 0:
                     if player.bag[item_selection + item_start_range] == "Capture Ball":
                         if mode == "Start-Item":
                             capture_prompts(stdscr, 17, w, player, None, item_selection + item_start_range, pythomon_target, target_owner, False)
@@ -464,7 +464,7 @@ def print_store(stdscr, h, w, player, store):
 
     for pythomon in player.pythomon:
         if pythomon.status == "alive":
-            pythomon.hp = pythomon.max_hp
+            pythomon.heal(pythomon.max_hp)
 
     player_inventory = {
         "Health Spray": 0,
@@ -583,7 +583,7 @@ def trainer_battle(stdscr, h, w, player):
         battle(stdscr, h, w, player, pythomon, f"{trainer.name}'s", init_menu, engaged_menu)
 
     trainer.pythomon[len(trainer.pythomon) - 1].revive()
-    trainer.pythomon[len(trainer.pythomon) - 1].heal(1000)
+    trainer.pythomon[len(trainer.pythomon) - 1].heal(pythomon[len(trainer.pythomon) - 1].max_hp)
     player.pythomon.append(trainer.pythomon[len(trainer.pythomon) - 1])
     player.trophies.append(random_trophy)
     player.money += trainer.money
