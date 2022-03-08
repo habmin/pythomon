@@ -10,7 +10,7 @@ from assets import traits
 from assets import pythodeck
 from assets import trainer_names
 from assets import about_blurbs
-from assets import trainer_art
+from assets import congrats
 
 def start_screen(stdscr, h, w):
     subtitle = "Pythomon! - A Python Battle Game!"
@@ -174,10 +174,11 @@ def print_grid(stdscr, h, w, grid, player):
     # Print info and instructions
     stdscr.addstr(4, (3 * len(grid[0])) + 7, f"{player.name}")
     stdscr.addstr(5, (3 * len(grid[0])) + 7, f"Money: ${player.money}")
-    stdscr.addstr(6, (3 * len(grid[0])) + 7, f"Pythomon: {len(list(filter(lambda pythomon: pythomon.hp > 0, player.pythomon)))}/{len(player.pythomon)}")
-    stdscr.addstr(7, (3 * len(grid[0])) + 7, "Use arrow keys to move")
-    stdscr.addstr(8, (3 * len(grid[0])) + 7, "$ = Store, T = Trainer Battle")
-    stdscr.addstr(9, (3 * len(grid[0])) + 7, "Press 'q' anytime to exit game")
+    stdscr.addstr(6, (3 * len(grid[0])) + 7, f"Trophies: {len(player.trophies)}/4")
+    stdscr.addstr(7, (3 * len(grid[0])) + 7, f"Pythomon: {len(list(filter(lambda pythomon: pythomon.hp > 0, player.pythomon)))}/{len(player.pythomon)}")
+    stdscr.addstr(8, (3 * len(grid[0])) + 7, "Use arrow keys to move")
+    stdscr.addstr(9, (3 * len(grid[0])) + 7, "$ = Store, T = Trainer Battle")
+    stdscr.addstr(10, (3 * len(grid[0])) + 7, "Press 'q' anytime to exit game")
 
 def gameover(stdscr, h, w):
     thanks = "Thanks for playing!"
@@ -255,9 +256,9 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                 if keypress == ord('q'):
                     quit_prompt(stdscr)   
 
-                elif keypress == curses.KEY_UP and pythodeck_selection > pytho_start_range:
+                elif keypress == curses.KEY_UP and pythodeck_selection > 0:
                     pythodeck_selection -= 1
-                elif keypress == curses.KEY_UP and pythodeck_selection == pytho_start_range and pythodeck_selection > 0:
+                elif keypress == curses.KEY_UP and pytho_start_range > 0 and pythodeck_selection == 0:
                     pytho_start_range -= 1
                     pytho_end_range -= 1
                 elif keypress == curses.KEY_DOWN and pythodeck_selection < (len(player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)]) - 1):
@@ -295,9 +296,9 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                 if keypress == ord('q'):
                     quit_prompt(stdscr)     
             
-                elif keypress == curses.KEY_UP and item_selection > item_start_range:
+                elif keypress == curses.KEY_UP and item_selection > 0:
                     item_selection -= 1
-                elif keypress == curses.KEY_UP and item_selection == item_start_range and item_selection > 0:
+                elif keypress == curses.KEY_UP and item_start_range > 0 and item_selection == 0:
                     item_start_range -= 1
                     item_end_range -= 1
                 elif keypress == curses.KEY_DOWN and item_selection < (len(player.bag[item_start_range:min(item_end_range, item_max_range)]) - 1):
@@ -315,7 +316,7 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                         if mode == "Start-Item":
                             capture_prompts(stdscr, 17, w, player, None, item_selection + item_start_range, pythomon_target, target_owner, False)
                         else:
-                            if capture_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], item_selection + item_start_range, pythomon_target, target_owner, True):
+                            if capture_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], item_selection + item_start_range, pythomon_target, target_owner, True):
                                 break
                     else:
                         if mode == "Start-Item":
@@ -348,9 +349,9 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                 if keypress == ord('q'):
                     quit_prompt(stdscr)     
             
-                elif keypress == curses.KEY_UP and health_selection > damaged_start_range:
+                elif keypress == curses.KEY_UP and health_selection > 0:
                     health_selection -= 1
-                elif keypress == curses.KEY_UP and health_selection == damaged_start_range and health_selection > 0:
+                elif keypress == curses.KEY_UP and damaged_start_range > 0 and health_selection == 0:
                     damaged_start_range -= 1
                     damaged_end_range -= 1
                 elif keypress == curses.KEY_DOWN and health_selection < (len(damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)]) - 1):
@@ -407,7 +408,7 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                 # Print menu option for engaged mode
                 print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
                 stdscr.addstr(19, 15, ">")
-                for i, option in enumerate(player.pythomon[pythodeck_selection + pytho_start_range].moves):
+                for i, option in enumerate(player.pythomon[pytho_select_index].moves):
                     blank_space = ' ' * (16 - len(option["name"]))
                     if i == moves_selection:
                         stdscr.attron(curses.color_pair(1))
@@ -422,14 +423,14 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
             
                 elif keypress == curses.KEY_UP and moves_selection > 0:
                     moves_selection -= 1
-                elif keypress == curses.KEY_DOWN and moves_selection < (len(player.pythomon[pythodeck_selection + pytho_start_range].moves) - 1):
+                elif keypress == curses.KEY_DOWN and moves_selection < (len(player.pythomon[pytho_select_index].moves) - 1):
                     moves_selection += 1
                 elif keypress == curses.KEY_BACKSPACE or keypress == 8:
                     mode = "Engaged"
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
                     # Commence attack! Returns true if target is defeated
-                    if attack_prompts(stdscr, 17, w, f"{player.name}'s", player.pythomon[pythodeck_selection + pytho_start_range], moves_selection, pythomon_target, True):
-                        win_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], pythomon_target, target_owner)
+                    if attack_prompts(stdscr, 17, w, f"{player.name}'s", player.pythomon[pytho_select_index], moves_selection, pythomon_target, True):
+                        win_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], pythomon_target, target_owner)
                         # exit encounter
                         break
                     else:
@@ -438,8 +439,8 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
             
         # computer's turn
         else:
-            if attack_prompts(stdscr, 17, w, target_owner, pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pythodeck_selection + pytho_start_range], False):
-                if defeated_prompts(stdscr, 17, w, player, player.pythomon[pythodeck_selection + pytho_start_range], pythomon_target, target_owner):
+            if attack_prompts(stdscr, 17, w, target_owner, pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pytho_select_index], False):
+                if defeated_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], pythomon_target, target_owner):
                     gameover(stdscr, h, w)
                     return True
                 else:
@@ -502,13 +503,6 @@ def print_store(stdscr, h, w, player, store):
         if not_enough:
             stdscr.addstr((h // 2) - 4, (w // 2) - (len(not_enough_money_text) // 2), not_enough_money_text)
 
-        line = "═" * (w - 2)
-        stdscr.addstr(0, 0, f"╔{line}╗")
-        for i in range(h - 3):
-            stdscr.addstr(i + 1, 0, "║")
-            stdscr.addstr(i + 1, w - 1, "║")
-        stdscr.addstr(h - 2, 0, f"╚{line}╝")
-
         for i, item in enumerate(menu):
             if i != len(menu) - 1:
                 blank_space = ' ' * (16 - len(store.items[i]["name"]))
@@ -530,6 +524,8 @@ def print_store(stdscr, h, w, player, store):
             blank_space = ' ' * (12 - len(key))
             stdscr.addstr((h // 2) + i, math.floor(w * .62), f"{key}{blank_space} X {value}")
 
+        print_box(stdscr, h, w)
+        
         keypress = stdscr.getch()
         if keypress == ord('q'):
             quit_prompt(stdscr)
@@ -547,10 +543,6 @@ def print_store(stdscr, h, w, player, store):
             else:
                 not_enough = True
 
-def print_trainer(stdscr, h, w, trainer):
-    for i, line in enumerate(trainer_art):
-        stdscr.addstr(i + 1, (w // 2) - (len(line)// 2), line)
-
 def trainer_battle(stdscr, h, w, player):
     # create pythmodeck for trainer
     trainers_pythomon = []
@@ -566,20 +558,22 @@ def trainer_battle(stdscr, h, w, player):
 
     # level up pythmon based on trophy amount
     for pythomon in trainers_pythomon:
-        pythomon.base_atk += len(player.trophies) * 3
-        pythomon.max_hp += len(player.trophies) * 3
+        pythomon.base_atk += len(player.trophies) * 6
+        pythomon.max_hp += len(player.trophies) * 6
         pythomon.hp = pythomon.max_hp
 
     # create trainer
-    trainer = Trainer(trainer_names[random.randint(0, len(trainer_names) - 1)], trainers_pythomon, 100 * player.trophies, trainers_pythomon[len(trainers_pythomon) - 1], about_blurbs[random.randint(0, len(about_blurbs) - 1)])
+    trainer = Trainer(trainer_names[random.randint(0, len(trainer_names) - 1)], trainers_pythomon, 100 * len(player.trophies), trainers_pythomon[len(trainers_pythomon) - 1], about_blurbs[random.randint(0, len(about_blurbs) - 1)])
 
-    print_trainer(stdscr, h, w, trainer)
+    print_trainer(stdscr, 1, w)
     incoming = f"Here comes {trainer.name}!!"
     about = f"About: {trainer.about}"
     battle_text = "Get ready for battle!"
-    stdscr.addstr(20, (w // 2) - (len(incoming)// 2), incoming)
-    stdscr.addstr(21, (w // 2) - (len(about)// 2), about)
-    stdscr.addstr(22, (w // 2) - (len(battle_text)// 2), battle_text)
+    stdscr.addstr(20, (w // 2) - (len(incoming) // 2), incoming)
+    stdscr.addstr(21, (w // 2) - (len(about) // 2), about)
+    if len(player.trophies) < 3:
+        stdscr.addstr(22, (w // 2) - (len(battle_text) // 2), battle_text)
+    print_box(stdscr, h, w)
     stdscr.refresh()
     time.sleep(4)
 
@@ -592,15 +586,40 @@ def trainer_battle(stdscr, h, w, player):
     trainer.pythomon[len(trainer.pythomon) - 1].heal(1000)
     player.pythomon.append(trainer.pythomon[len(trainer.pythomon) - 1])
     player.trophies.append(random_trophy)
+    player.money += trainer.money
 
     stdscr.clear()
 
-    print_trainer(stdscr, h, w, trainer)
+    print_trainer(stdscr, 1, w)
     won = f"You beat {trainer.name}!!"
+    won_money = f"You gained ${trainer.money}"
     next_battle = "Get ready for the next trainer!"
-    stdscr.addstr(20, (w // 2) - (len(won)// 2), won)
-    stdscr.addstr(21, (w // 2) - (len(next_battle)// 2), next_battle)
+    stdscr.addstr(20, (w // 2) - (len(won) // 2), won)
+    stdscr.addstr(21, (w // 2) - (len( won_money) // 2),  won_money)
+    stdscr.addstr(22, (w // 2) - (len(next_battle) // 2), next_battle)
+    print_box(stdscr, h, w)
     stdscr.refresh()
     time.sleep(4)
     
     return True
+
+def print_victory(stdscr, h, w):
+    while True:
+        stdscr.clear()
+        for i, line in enumerate(congrats):
+            stdscr.addstr(2 + i, (w // 2) - (len(line) // 2), line)
+        for i in range(len(pythodeck[0]["art"])):
+            stdscr.addstr(9 + i, (w // 2) - 36, "{}{}{}{}".format(pythodeck[0]["art"][i], pythodeck[1]["art"][i], pythodeck[2]["art"][i], pythodeck[3]["art"][i]))
+        
+        congrats_text = "Congratulations! You are the Pythomon Master!"
+        play_again_text = "Press 'p' to play again, or 'q' to quit."
+        stdscr.addstr(20, (w // 2) - (len(congrats_text) // 2), congrats_text)
+        stdscr.addstr(21, (w // 2) - (len(play_again_text) // 2), play_again_text)
+        print_box(stdscr, h, w)
+        
+        keypress = stdscr.getch()
+        if keypress == ord('q'):
+            quit_prompt(stdscr)
+        elif keypress == ord('p'):
+            return
+        stdscr.refresh()

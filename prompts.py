@@ -1,5 +1,6 @@
 import curses
 import time
+from assets import trainer_art
 
 def quit_prompt(stdscr):
     stdscr.addstr(0, 0, "Are you sure you want to Quit? Press 'y' to confirm, otherwise press any other key to cancel")
@@ -92,7 +93,7 @@ def level_up_prompt(stdscr, h, w, player, players_pythomon, encounter):
     time.sleep(2)
     for pythomon in player.pythomon:
         if pythomon == players_pythomon:
-            pass
+            continue
         elif pythomon.level_up(encounter.exp_prize // 2):
             stdscr.addstr(h, 0, f"{' ' * w}")
             stdscr.addstr(h, 5, f"{pythomon.name} leveled up! Gained 3 MAX HP and ATK")
@@ -146,9 +147,6 @@ def capture_prompts(stdscr, h, w, player, players_pythomon, item_idx, encounter,
             time.sleep(2)
     return False
 
-
-        
-        
 def defeated_prompts(stdscr, h, w, player, defeated_pythomon, encounter, encounter_owner):
     print_pythomon(stdscr, 3, 5, defeated_pythomon, True, True)
     stdscr.addstr(h, 0, f"{' ' * w}")
@@ -162,3 +160,15 @@ def defeated_prompts(stdscr, h, w, player, defeated_pythomon, encounter, encount
         time.sleep(3)
         return True
     return False
+
+def print_trainer(stdscr, h, w):
+    for i, line in enumerate(trainer_art):
+        stdscr.addstr(h + i, (w // 2) - (len(line)// 2), line)
+
+def print_box(stdscr, h, w):
+    line = "═" * (w - 2)
+    stdscr.addstr(0, 0, f"╔{line}╗")
+    for i in range(h - 3):
+        stdscr.addstr(i + 1, 0, "║")
+        stdscr.addstr(i + 1, w - 1, "║")
+    stdscr.addstr(h - 2, 0, f"╚{line}╝")

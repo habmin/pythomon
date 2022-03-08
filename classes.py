@@ -7,7 +7,7 @@ class Player:
         self.name = name
         self.money = 100
         self.pythomon = [starter]
-        self.bag = ["Health Spray", "Health Spray", "Health Spray", "Revive", "Capture Ball", "Capture Ball", "Capture Ball"]
+        self.bag = ["Health Spray", "Health Spray", "Health Spray", "Revive", "Capture Ball", "Capture Ball", "Capture Ball", "Capture Ball", "Revive"]
         self.gender = gender
         self.nature = nature
         self.defeated = False
@@ -18,6 +18,8 @@ class Player:
         self.pythomon.append(Pythomon(pythodeck[4]))
         self.pythomon.append(Pythomon(pythodeck[5]))
         self.pythomon.append(Pythomon(pythodeck[6]))
+        self.pythomon.append(Pythomon(pythodeck[7]))
+        self.pythomon.append(Pythomon(pythodeck[8]))
     
     def check_defeated(self):
         for pytho in self.pythomon:
@@ -52,7 +54,7 @@ class Pythomon:
 
     def level_up(self, exp):
         self.exp += exp
-        if exp >= 100:
+        if self.exp >= 100:
             self.max_hp += 3
             self.base_atk += 3
             if self.status == "alive":

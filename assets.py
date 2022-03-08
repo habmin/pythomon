@@ -160,7 +160,7 @@ pythodeck = [
         "moves": [{
             "name": "SCREAMING",
             "power": 10}],
-        "exp_prize": 15,
+        "exp_prize": 25,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -179,7 +179,7 @@ pythodeck = [
         "moves": [{
             "name": "Splash",
             "power": 10}],
-        "exp_prize": 15,
+        "exp_prize": 25,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -236,7 +236,7 @@ pythodeck = [
         "moves": [{
             "name": "Spits",
             "power": 10}],
-        "exp_prize": 15,
+        "exp_prize": 25,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -255,7 +255,7 @@ pythodeck = [
         "moves": [{
             "name": "fly hard",
             "power": 15}],
-        "exp_prize": 20,
+        "exp_prize": 30,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -293,7 +293,7 @@ pythodeck = [
         "moves": [{
             "name": "Dirt mode",
             "power": 10}],
-        "exp_prize": 15,
+        "exp_prize": 25,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -312,7 +312,7 @@ pythodeck = [
         "moves": [{
             "name": "Fossilize",
             "power": 10}],
-        "exp_prize": 25,
+        "exp_prize": 35,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -331,7 +331,7 @@ pythodeck = [
         "moves": [{
             "name": "Spinning Belly",
             "power": 10}],
-        "exp_prize": 25,
+        "exp_prize": 35,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -350,7 +350,7 @@ pythodeck = [
         "moves": [{
             "name": "Wool Choke",
             "power": 10}],
-        "exp_prize": 25,
+        "exp_prize": 35,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -369,7 +369,7 @@ pythodeck = [
         "moves": [{
             "name": "Leaf Slap",
             "power": 6}],
-        "exp_prize": 20,
+        "exp_prize": 30,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -388,7 +388,7 @@ pythodeck = [
         "moves": [{
             "name": "Whine",
             "power": 5}],
-        "exp_prize": 10,
+        "exp_prize": 20,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -407,7 +407,7 @@ pythodeck = [
         "moves": [{
             "name": "Dunk",
             "power": 15}],
-        "exp_prize": 25,
+        "exp_prize": 35,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -426,7 +426,7 @@ pythodeck = [
         "moves": [{
             "name": "Mud Kiss",
             "power": 10}],
-        "exp_prize": 17,
+        "exp_prize": 27,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -464,7 +464,7 @@ pythodeck = [
         "moves": [{
             "name": "Cute attack",
             "power": 10}],
-        "exp_prize": 20,
+        "exp_prize": 30,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -483,7 +483,7 @@ pythodeck = [
         "moves": [{
             "name": "Big Bite",
             "power": 10}],
-        "exp_prize": 20,
+        "exp_prize": 30,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -502,7 +502,7 @@ pythodeck = [
         "moves": [{
             "name": "Eletric Drip",
             "power": 10}],
-        "exp_prize": 30,
+        "exp_prize": 40,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -521,7 +521,7 @@ pythodeck = [
         "moves": [{
             "name": "Swoop",
             "power": 10}],
-        "exp_prize": 25,
+        "exp_prize": 35,
         "art": [
             "         ▒▒▒▒▒▒▒▒ ",
             "       ▒▒▒▒▒▓▓▒▒▒▓",
@@ -532,25 +532,6 @@ pythodeck = [
             "     ▒▒▒▒▒▒▒▓▒▒▒  ",
             "     ▒▒▒▒    ▒▒▒  "
         ]},
-    {
-        "name": "EXP Tester", 
-        "hp": 100, 
-        "base_atk": 100, 
-        "gender": "suave bird",
-        "moves": [{
-            "name": "Swoop",
-            "power": 100}],
-        "exp_prize": 200,
-        "art": [
-            "         ▒▒▒▒▒▒▒▒ ",
-            "       ▒▒▒▒▒▓▓▒▒▒▓",
-            "  ▒▒▒  ▓▒▒▒▒▒▒▒▒▒▒",
-            " ▒▒▒▒▒▓▓▓▒▒▒▒▒▒▒▒▒",
-            " ▒▒▒▒▒█▓▒▒▒▒▒▒▒▒▒▒",
-            "   ▒▒▒▓▒▒▒▒▒▒▓▓   ",
-            "     ▒▒▒▒▒▒▒▓▒▒▒  ",
-            "     ▒▒▒▒    ▒▒▒  "
-        ]}
 ]
 
 trainer_art = [

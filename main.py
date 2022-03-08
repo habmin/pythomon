@@ -49,7 +49,7 @@ def main(stdscr):
         
         # create store
         store = Store()
-        while len(player.trophies) < 4:
+        while len(player.trophies) < 2:
             # Player's coordinates
             player_x = 0
             player_y = 0
@@ -64,7 +64,6 @@ def main(stdscr):
             grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
             while not player.defeated:
                 stdscr.clear()
-
                 if grid[player_y][player_x].terrain == "encounter":
                     encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]), "Wild")
                     grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
@@ -79,6 +78,7 @@ def main(stdscr):
                         break
                     stdscr.clear()
 
+                # print_box(stdscr, height, width)
                 print_grid(stdscr, height, width, grid, player)
 
                 keypress = stdscr.getch()
@@ -102,7 +102,8 @@ def main(stdscr):
                     quit_prompt(stdscr)
 
                 stdscr.refresh()
-        print_victory(stdscr, height, width, player)
+
+        print_victory(stdscr, height, width)
     # Done with game, reset curs_set and end
     curses.curs_set(1)
     curses.endwin()
