@@ -49,7 +49,7 @@ def main(stdscr):
         
         # create store
         store = Store()
-        while len(player.trophies) < 4:
+        while len(player.trophies) < 4 and not player.defeated:
             # Player's coordinates
             player_x = 0
             player_y = 0
@@ -62,10 +62,11 @@ def main(stdscr):
                 store_col = random.randint(0, grid_width - 1)
             
             grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
-            while not player.defeated:
+            while True:
                 stdscr.clear()
                 if grid[player_y][player_x].terrain == "encounter":
-                    encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]), "Wild")
+                    if encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]), "Wild"):
+                        break
                     grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
                     stdscr.clear()
                 
@@ -74,9 +75,9 @@ def main(stdscr):
                     stdscr.clear()
 
                 elif grid[player_y][player_x].terrain == "trainer":
-                    if trainer_battle(stdscr, height, width, player):
-                        break
+                    trainer_battle(stdscr, height, width, player)
                     stdscr.clear()
+                    break
 
                 # print_box(stdscr, height, width)
                 print_grid(stdscr, height, width, grid, player)
@@ -102,8 +103,10 @@ def main(stdscr):
                     quit_prompt(stdscr)
 
                 stdscr.refresh()
-
-        print_victory(stdscr, height, width)
+        if not player.defeated:
+            print_victory(stdscr, height, width)
+        else:
+            gameover_screen(stdscr, height, width)
     # Done with game, reset curs_set and end
     curses.curs_set(1)
     curses.endwin()

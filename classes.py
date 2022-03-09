@@ -3,28 +3,15 @@ from assets import traits
 from assets import pythodeck
 
 class Player:
-    def __init__(self, starter, trophy, name = "Ashy", gender = "Male", nature = traits[0], ):
+    def __init__(self, starter, trophy, name = "Ashy", gender = "Male", nature = traits[0]):
         self.name = name
         self.money = 100
         self.pythomon = [starter]
-        self.bag = ["Health Spray", "Health Spray", "Health Spray", "Capture Ball", "Health Spray", "Health Spray", "Health Spray", "Capture Ball", "Health Spray"]
+        self.bag = ["Health Spray", "Health Spray", "Capture Ball"]
         self.gender = gender
         self.nature = nature
         self.defeated = False
         self.trophies = [trophy]
-        self.pythomon.append(Pythomon(pythodeck[1]))
-        self.pythomon.append(Pythomon(pythodeck[2]))
-        self.pythomon.append(Pythomon(pythodeck[3]))
-        self.pythomon.append(Pythomon(pythodeck[4]))
-        self.pythomon.append(Pythomon(pythodeck[5]))
-        self.pythomon.append(Pythomon(pythodeck[6]))
-        self.pythomon.append(Pythomon(pythodeck[7]))
-        self.pythomon.append(Pythomon(pythodeck[8]))
-        self.pythomon.append(Pythomon(pythodeck[9]))
-        self.pythomon.append(Pythomon(pythodeck[10]))
-
-        for pythomon in self.pythomon:
-            pythomon.hp -= 10
     
     def check_defeated(self):
         for pytho in self.pythomon:

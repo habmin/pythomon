@@ -3,6 +3,7 @@ import random
 import math
 from classes import *
 from prompts import *
+from battle import battle
 from assets import title
 from assets import gameover
 from assets import traits
@@ -179,7 +180,7 @@ def print_grid(stdscr, h, w, grid, player):
     stdscr.addstr(9, (3 * len(grid[0])) + 7, "$ = Store, T = Trainer Battle")
     stdscr.addstr(10, (3 * len(grid[0])) + 7, "Press 'q' anytime to exit game")
 
-def gameover(stdscr, h, w):
+def gameover_screen(stdscr, h, w):
     thanks = "Thanks for playing!"
     stdscr.clear()
     for i, line in enumerate(gameover):
@@ -189,280 +190,12 @@ def gameover(stdscr, h, w):
     stdscr.addstr((h // 2) + 2, ((w // 2) - (len(thanks) // 2)), thanks)
     refresh_sleep(stdscr, 5)
 
-def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engaged_menu):
-    moves_selection = 0
-    init_selection = 0
-    item_selection = 0
-    mode = "Start"
-    keypress = 0
-    pythodeck_selection = 0
-    pytho_start_range = 0
-    pytho_end_range = pytho_start_range + min(len(player.pythomon), 4)
-    pytho_max_range = len(player.pythomon)
-    pytho_select_index = 0
-    item_start_range = 0
-    item_end_range = item_start_range + min(len(player.bag), 4)
-    item_max_range = len(player.bag)
-    health_selection = 0
-    damaged_start_range = 0
-    # 1 starts with players turn
-    turn = 1
-    deployed = False
-    while pythomon_target.hp > 0:
-        stdscr.clear()
-
-        # print encountered pythomon until dead
-        print_pythomon(stdscr, 3, 50, pythomon_target, False, False)
-        
-        # Print player's pythomon once selected/deployed
-        if deployed:
-            print_pythomon(stdscr, 3, 5, player.pythomon[pytho_select_index], True, False)
-
-        # Players turn
-        if turn % 2 == 1:
-            # Initial start of encounter mode
-            
-            # Engaged mode (selected a pythomon)
-            if mode == "Start":
-                # Print initial menu
-                print_menu_1(stdscr, 19, 5, init_menu, init_selection)
-                
-                keypress = stdscr.getch()
-                if keypress == ord('q'):
-                    quit_prompt(stdscr)
-
-                elif keypress == curses.KEY_UP and init_selection > 0:
-                    init_selection -= 1
-                elif keypress == curses.KEY_DOWN and init_selection < (len(init_menu) - 1):
-                    init_selection += 1
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Fight":
-                    mode = "Select Pythomon"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Item":
-                    mode = "Start-Item"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Run":
-                    break
-
-            elif mode == "Select Pythomon" or mode == "Switch":
-                # Print initial menu
-                if mode == "Select Pythomon":
-                    print_menu_1(stdscr, 19, 5, init_menu, init_selection)
-                else:
-                    print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
-
-                print_menu_select_pythomon(stdscr, 19, 20, player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)], pythodeck_selection, pytho_end_range < pytho_max_range, pytho_start_range > 0)
-
-                keypress = stdscr.getch()
-                if keypress == ord('q'):
-                    quit_prompt(stdscr)   
-
-                elif keypress == curses.KEY_UP and pythodeck_selection > 0:
-                    pythodeck_selection -= 1
-                elif keypress == curses.KEY_UP and pytho_start_range > 0 and pythodeck_selection == 0:
-                    pytho_start_range -= 1
-                    pytho_end_range -= 1
-                elif keypress == curses.KEY_DOWN and pythodeck_selection < (len(player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)]) - 1):
-                    pythodeck_selection += 1
-                elif keypress == curses.KEY_DOWN and pythodeck_selection == (len(player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)]) - 1) and pytho_end_range != len(player.pythomon):
-                    pytho_start_range += 1
-                    pytho_end_range += 1
-                elif keypress == curses.KEY_BACKSPACE or keypress == 8:
-                    if mode == "Select Pythomon":
-                        mode = "Start"
-                    else:
-                        mode = "Engaged"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and player.pythomon[pythodeck_selection + pytho_start_range].status == "alive":
-                    pytho_select_index = pythodeck_selection + pytho_start_range
-                    pythodeck_selection = 0
-                    pytho_start_range = 0
-                    pytho_end_range = pytho_start_range + min(len(player.pythomon), 4)
-                    pytho_max_range = len(player.pythomon)
-                    deployed = True
-                    mode = "Engaged"
-
-                
-            elif mode == "Start-Item" or mode == "Engaged-Item":
-                # Print initial menu
-                if mode == "Start-Item":
-                    print_menu_1(stdscr, 19, 5, init_menu, init_selection)
-                else:
-                    print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
-
-                stdscr.addstr(19, 15, ">")
-                if len(player.bag) == 0:
-                    stdscr.attron(curses.color_pair(1))
-                    stdscr.addstr(19, 20, "No Items")
-                    stdscr.attroff(curses.color_pair(1))
-                else:
-                    print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
-    
-                keypress = stdscr.getch()
-                if keypress == ord('q'):
-                    quit_prompt(stdscr)     
-            
-                elif keypress == curses.KEY_UP and item_selection > 0:
-                    item_selection -= 1
-                elif keypress == curses.KEY_UP and item_start_range > 0 and item_selection == 0:
-                    item_start_range -= 1
-                    item_end_range -= 1
-                elif keypress == curses.KEY_DOWN and item_selection < (len(player.bag[item_start_range:min(item_end_range, item_max_range)]) - 1):
-                    item_selection += 1
-                elif keypress == curses.KEY_DOWN and item_selection == (len(player.bag[item_start_range:min(item_end_range, item_max_range)]) - 1) and item_end_range != len(player.bag):
-                    item_start_range += 1
-                    item_end_range += 1
-                elif keypress == curses.KEY_BACKSPACE or keypress == 8:
-                    if mode == "Start-Item":
-                        mode = "Start"
-                    else:
-                        mode = "Engaged"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and len(player.bag) != 0:
-                    if player.bag[item_selection + item_start_range] == "Capture Ball":
-                        if mode == "Start-Item":
-                            capture_prompts(stdscr, 17, w, player, None, item_selection + item_start_range, pythomon_target, target_owner, False)
-                        else:
-                            if capture_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], item_selection + item_start_range, pythomon_target, target_owner, True):
-                                break
-                    else:
-                        if mode == "Start-Item":
-                            mode = "Start-Heal"
-                        else: 
-                            mode = "Engaged-Heal"
-            
-            elif mode == "Start-Heal" or mode == "Engaged-Heal":
-                if player.bag[item_selection + item_start_range] == "Revive":
-                    damaged_pythomon = list(filter(lambda pythomon: pythomon.status == "dead", player.pythomon))
-                else:
-                    damaged_pythomon = list(filter(lambda pythomon: pythomon.hp < pythomon.max_hp and pythomon.status == "alive", player.pythomon))
-                damaged_end_range = damaged_start_range + min(len(damaged_pythomon), 4)
-                damaged_max_range = len(damaged_pythomon)         
-                # print initial menu
-                if mode == "Start-Heal":
-                    print_menu_1(stdscr, 19, 5, init_menu, init_selection)
-                else:
-                    print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
-                # print start-item menu
-                stdscr.addstr(19, 15, ">")
-                print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
-                # print heal menu
-                stdscr.addstr(19, 37, ">")
-                print_heal_menu(stdscr, 19, 42, damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)], health_selection, damaged_start_range, damaged_end_range, damaged_max_range, player.bag[item_selection + item_start_range])
-                
-                keypress = stdscr.getch()
-                if keypress == ord('q'):
-                    quit_prompt(stdscr)     
-            
-                elif keypress == curses.KEY_UP and health_selection > 0:
-                    health_selection -= 1
-                elif keypress == curses.KEY_UP and damaged_start_range > 0 and health_selection == 0:
-                    damaged_start_range -= 1
-                    damaged_end_range -= 1
-                elif keypress == curses.KEY_DOWN and health_selection < (len(damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)]) - 1):
-                    health_selection += 1
-                elif keypress == curses.KEY_DOWN and health_selection == (len(damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)]) - 1) and damaged_end_range != len(damaged_pythomon):
-                    damaged_start_range += 1
-                    damaged_end_range += 1
-                elif keypress == curses.KEY_BACKSPACE or keypress == 8:
-                    if mode == "Start-Heal":
-                        mode = "Start-Item"
-                    else:
-                        mode = "Engaged-Item"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and len(damaged_pythomon) > 0:
-                    if player.bag[item_selection + item_start_range] == "Revive":
-                        damaged_pythomon[health_selection + damaged_start_range].revive()
-                    elif player.bag[item_selection + item_start_range] == "Health Spray":
-                        damaged_pythomon[health_selection + damaged_start_range].heal(20)
-                    else:
-                        damaged_pythomon[health_selection + damaged_start_range].heal(50)
-                    health_selection = 0
-                    damaged_start_range = 0
-                    player.bag.pop(item_selection + item_start_range)
-                    item_selection = 0
-                    item_start_range = 0
-                    item_end_range = item_start_range + min(len(player.bag), 4)
-                    item_max_range = len(player.bag)
-                    stdscr.addstr(14, 5, f"HP: {player.pythomon[pytho_select_index]}")
-                    if mode == "Start-Heal":
-                        mode = "Start-Item"
-                    else:
-                        print_pythomon(stdscr, 14, 5, player.pythomon[health_selection + damaged_start_range], True, False)
-                        turn += 1
-                        mode = "CPU"
-            
-            elif mode == "Engaged":                
-                # Print menu option for engaged mode
-                print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
-
-                keypress = stdscr.getch()
-                if keypress == ord('q'):
-                    quit_prompt(stdscr)     
-            
-                elif keypress == curses.KEY_UP and init_selection > 0:
-                    init_selection -= 1
-                elif keypress == curses.KEY_DOWN and init_selection < (len(engaged_menu) - 1):
-                    init_selection += 1
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Attack":
-                    mode = "Attack"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Item":
-                    mode = "Engaged-Item"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Switch":
-                    mode = "Switch"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and engaged_menu[init_selection] == "Run":
-                    break
-                
-            elif mode == "Attack":
-                # Print menu option for engaged mode
-                print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
-                stdscr.addstr(19, 15, ">")
-                for i, option in enumerate(player.pythomon[pytho_select_index].moves):
-                    blank_space = ' ' * (16 - len(option["name"]))
-                    if i == moves_selection:
-                        stdscr.attron(curses.color_pair(1))
-                        stdscr.addstr((19) + i, 20, "{}{}POW:{}".format(option["name"], blank_space, option["power"]))
-                        stdscr.attroff(curses.color_pair(1))
-                    else:
-                        stdscr.addstr((19) + i, 20, "{}{}POW:{}".format(option["name"], blank_space, option["power"]))
-
-                keypress = stdscr.getch()
-                if keypress == ord('q'):
-                    quit_prompt(stdscr)     
-            
-                elif keypress == curses.KEY_UP and moves_selection > 0:
-                    moves_selection -= 1
-                elif keypress == curses.KEY_DOWN and moves_selection < (len(player.pythomon[pytho_select_index].moves) - 1):
-                    moves_selection += 1
-                elif keypress == curses.KEY_BACKSPACE or keypress == 8:
-                    mode = "Engaged"
-                elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
-                    # Commence attack! Returns true if target is defeated
-                    if attack_prompts(stdscr, 17, w, f"{player.name}'s", player.pythomon[pytho_select_index], moves_selection, pythomon_target, True):
-                        win_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], pythomon_target, target_owner)
-                        # exit encounter
-                        break
-                    else:
-                        turn += 1
-                        mode = "CPU"
-            
-        # computer's turn
-        else:
-            if attack_prompts(stdscr, 17, w, target_owner, pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pytho_select_index], False):
-                if defeated_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], pythomon_target, target_owner):
-                    gameover(stdscr, h, w)
-                    return True
-                else:
-                    deployed = False
-                    mode = "Start"
-            else:
-                mode = "Engaged"
-            turn += 1
-
-        stdscr.refresh()
-    
-    # player was not defeated by battle
-    return False
-
 def encounter(stdscr, h, w, player, pythomon_target, target_owner):
     init_menu = ["Fight", "Item", "Run"]
     engaged_menu = ["Attack", "Item", "Switch", "Run"]
-    battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engaged_menu)
+    if battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engaged_menu):
+        return True
+    return False
 
 def print_store(stdscr, h, w, player, store):
 
@@ -556,14 +289,14 @@ def trainer_battle(stdscr, h, w, player):
     # last pythomon is the prize from the original first 4
     # select one that the player does not have yet
     random_trophy = random.randint(0, 3)
-    if random_trophy in player.trophies:
+    while random_trophy in player.trophies:
         random_trophy = random.randint(0, 3)
     trainers_pythomon.append(Pythomon(pythodeck[random_trophy]))
 
     # level up pythmon based on trophy amount
     for pythomon in trainers_pythomon:
-        pythomon.base_atk += len(player.trophies) * 6
-        pythomon.max_hp += len(player.trophies) * 6
+        pythomon.base_atk += len(player.trophies) * 7
+        pythomon.max_hp += len(player.trophies) * 7
         pythomon.hp = pythomon.max_hp
 
     # create trainer
@@ -583,7 +316,9 @@ def trainer_battle(stdscr, h, w, player):
     init_menu = ["Fight", "Item"]
     engaged_menu = ["Attack", "Item", "Switch"]
     for pythomon in trainer.pythomon:
-        battle(stdscr, h, w, player, pythomon, f"{trainer.name}'s", init_menu, engaged_menu)
+        # returns True if player is defeated during a battle
+        if battle(stdscr, h, w, player, pythomon, f"{trainer.name}'s", init_menu, engaged_menu):
+            return
 
     trainer.pythomon[len(trainer.pythomon) - 1].revive()
     trainer.pythomon[len(trainer.pythomon) - 1].heal(trainer.pythomon[len(trainer.pythomon) - 1].max_hp)
@@ -595,15 +330,16 @@ def trainer_battle(stdscr, h, w, player):
 
     print_trainer(stdscr, 1, w)
     won = f"You beat {trainer.name}!!"
-    won_money = f"You gained ${trainer.money}"
-    next_battle = "Get ready for the next trainer!"
+    if len(player.trophies) < 4:
+        won_money = f"You gained ${trainer.money}"
+        next_battle = "Get ready for the next trainer!"
     stdscr.addstr(20, (w // 2) - (len(won) // 2), won)
     stdscr.addstr(21, (w // 2) - (len( won_money) // 2),  won_money)
     stdscr.addstr(22, (w // 2) - (len(next_battle) // 2), next_battle)
     print_box(stdscr, h, w)
     refresh_sleep(stdscr, 4)
     
-    return True
+    return
 
 def print_victory(stdscr, h, w):
     while True:
