@@ -90,15 +90,53 @@ def print_pythomon(stdscr, h, w, pythomon, player_ownership, dead):
     stdscr.addstr(h + 10, w, f"{pythomon.nature} {pythomon.gender}")
     stdscr.addstr(h + 11, w, f"HP: {pythomon.healthbar}")
 
+def strike_animation(stdscr, h, w, pythomon, player_ownership):
+    for i, offset in enumerate([0, 1, 2, 5, 2, 1, 0]):
+        for j, line in enumerate(pythomon.art):
+            if player_ownership:
+                stdscr.addstr(j + h, w, (' ' * (len(line) + 5)))
+            else:
+                stdscr.addstr(j + h, w - 5, (' ' * (len(line) + 5)))
+        for k, line in enumerate(pythomon.art):
+            if player_ownership:
+                stdscr.addstr(k + h, w + offset, line)
+            else:
+                stdscr.addstr(k + h, w - offset, line[::-1])
+        refresh_sleep(stdscr, 0.04)
+
+def shake_pythomon(stdscr, h, w, pythomon, player_ownership):
+    for i in range(15):
+        for j, line in enumerate(pythomon.art):
+            stdscr.addstr(j + h, w - 2, (' ' * (len(line) + 4)))
+        for k, line in enumerate(pythomon.art):
+            if i % 2 == 0:
+                # Prints the art as formatted
+                if player_ownership:
+                    stdscr.addstr(k + h, w + 2, line)
+                else:
+                    stdscr.addstr(k + h, w + 2, line[::-1])
+            else:
+                if player_ownership:
+                    stdscr.addstr(k + h, w -2, line)
+                else:
+                    stdscr.addstr(k + h, w -2, line[::-1])
+        refresh_sleep(stdscr, 0.05)
+    for i, line in enumerate(pythomon.art):
+        stdscr.addstr(i + h, w - 2, (' ' * (len(line) + 4)))
+
 # Attack prompt and sequence
 def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target, players_turn):
     # If the attacker defeats the targer, returns True
     did_defeat = attacker.attack(target, move_idx)
     stdscr.addstr(h, 5, f"{owner} {attacker.name} uses {attacker.moves[move_idx].get('name')} against {target.name}!")
-    refresh_sleep(stdscr, 2)
+    refresh_sleep(stdscr, 1)
     if players_turn:
+        strike_animation(stdscr, 3, 5, attacker, players_turn)
+        shake_pythomon(stdscr, 3, 50, target, not players_turn)
         print_pythomon(stdscr, 3, 50, target, not players_turn, False)
     else:
+        strike_animation(stdscr, 3, 50, attacker, players_turn)
+        shake_pythomon(stdscr, 3, 5, target, not players_turn)
         print_pythomon(stdscr, 3, 5, target, not players_turn, False)
     stdscr.addstr(h, 0, f"{' ' * w}")
     stdscr.addstr(h, 5, f"{target.name} took {attacker.base_atk + attacker.moves[move_idx].get('power')} damage!")
