@@ -28,7 +28,7 @@ def grid_maker(height, width, encounter_rate, store_row, store_col, player_x, pl
 
     return grid
 
-def main(stdscr):
+def game_start(stdscr):
     # --- curses initializers ---
     curses.curs_set(0)                  # turn off cursor
     height, width = stdscr.getmaxyx()   # get terminal window height and width
@@ -153,5 +153,5 @@ if __name__ == "__main__":
             exit(1)
     
     # Run program after passed module check
-    curses.wrapper(main)
+    curses.wrapper(game_start)
                                                         
