@@ -30,6 +30,9 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
     health_selection = 0
     damaged_start_range = 0
 
+    # A key aspect in order for battle() to work, it's important to print and switch
+    # to the relavent keyboard listeners in order to work the menu selection correctly.
+    # This is done by switching to certain modes throughout the function's cycle.
     # Begin with 'Start' mode
     mode = "Start"
     # keypress handler
@@ -81,20 +84,27 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                 # Print engaged menu if switching out pythomon
                 else:
                     print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
-
+                
+                # Print pythomon selection menu
+                # Trims to at most 4 selection options based on the start and end ranges
+                # The last two arguements will print scroll indicators if there's more options for
+                # the player to choose from their total pythodeck
                 print_menu_select_pythomon(stdscr, 19, 20, player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)], pythodeck_selection, pytho_end_range < pytho_max_range, pytho_start_range > 0)
 
+                # Keyboard listerners/handlers
                 keypress = stdscr.getch()
                 if keypress == ord('q'):
                     quit_prompt(stdscr)   
 
                 elif keypress == curses.KEY_UP and pythodeck_selection > 0:
                     pythodeck_selection -= 1
+                # Decrease the menu range (scroll up)
                 elif keypress == curses.KEY_UP and pytho_start_range > 0 and pythodeck_selection == 0:
                     pytho_start_range -= 1
                     pytho_end_range -= 1
                 elif keypress == curses.KEY_DOWN and pythodeck_selection < (len(player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)]) - 1):
                     pythodeck_selection += 1
+                # Increase the menu range (scroll down)
                 elif keypress == curses.KEY_DOWN and pythodeck_selection == (len(player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)]) - 1) and pytho_end_range != len(player.pythomon):
                     pytho_start_range += 1
                     pytho_end_range += 1
@@ -111,7 +121,8 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                     pytho_max_range = len(player.pythomon)
                     deployed = True
                     mode = "Engaged"
-        
+
+            # Item selection menu
             elif mode == "Start-Item" or mode == "Engaged-Item":
                 if mode == "Start-Item":
                     print_menu_1(stdscr, 19, 5, init_menu, init_selection)
@@ -119,10 +130,15 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                     print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
 
                 stdscr.addstr(19, 15, ">")
+                # Indicate if player has no items
                 if len(player.bag) == 0:
                     stdscr.attron(curses.color_pair(1))
                     stdscr.addstr(19, 20, "No Items")
                     stdscr.attroff(curses.color_pair(1))
+                # otherwise, Print item selection menu
+                # Trims to at most 4 selection options based on the start and end ranges
+                # The last two arguements will print scroll indicators if there's more options for
+                # the player to choose from their total bag
                 else:
                     print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
     
@@ -158,19 +174,26 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                         else: 
                             mode = "Engaged-Heal"
             
+            # Heal menu mode
             elif mode == "Start-Heal" or mode == "Engaged-Heal":
+                # Create list/menu based if player is trying to revive dead pythomon or heal hurt pythomon
                 if player.bag[item_selection + item_start_range] == "Revive":
                     damaged_pythomon = list(filter(lambda pythomon: pythomon.status == "dead", player.pythomon))
                 else:
                     damaged_pythomon = list(filter(lambda pythomon: pythomon.hp < pythomon.max_hp and pythomon.status == "alive", player.pythomon))
+                
+                # These range handlers are initialized here to ensure dynamic sizing of the menu
+                # As the menu length changes mid battle and item useage
                 damaged_end_range = damaged_start_range + min(len(damaged_pythomon), 4)
                 damaged_max_range = len(damaged_pythomon)         
-                # print initial menu
+                
+                
                 if mode == "Start-Heal":
                     print_menu_1(stdscr, 19, 5, init_menu, init_selection)
                 else:
                     print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
-                # print start-item menu
+
+                # print item menu
                 stdscr.addstr(19, 15, ">")
                 print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
                 # print heal menu
@@ -203,6 +226,7 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                         damaged_pythomon[health_selection + damaged_start_range].heal(20)
                     else:
                         damaged_pythomon[health_selection + damaged_start_range].heal(50)
+                    # reset selection/range handlers
                     health_selection = 0
                     damaged_start_range = 0
                     player.bag.pop(item_selection + item_start_range)
@@ -274,14 +298,19 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
             
         # computer's turn
         else:
+            # If player's pythomon is killed, returns true
             if attack_prompts(stdscr, 17, w, target_owner, pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pytho_select_index], False):
+                # If player's entire team is dead, the player loses and returns True
                 if defeated_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], pythomon_target, target_owner):
                     return True
+                # Otherwise, player can send out another pythomon
                 else:
                     deployed = False
                     mode = "Start"
+            # Player's pythomon survived
             else:
                 mode = "Engaged"
+            # Player's turn
             turn += 1
 
         stdscr.refresh()
