@@ -2,6 +2,11 @@ import curses
 import time
 from assets import trainer_art
 
+def refresh_sleep(stdscr, sec):
+    stdscr.refresh()
+    time.sleep(sec)
+    curses.flushinp()
+
 def quit_prompt(stdscr):
     stdscr.addstr(0, 0, "Are you sure you want to Quit? Press 'y' to confirm, otherwise press any other key to cancel")
     keypress = stdscr.getch()
@@ -65,99 +70,84 @@ def print_pythomon(stdscr, h, w, pythomon, player_ownership, dead):
 def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target, players_turn):
     did_defeat = attacker.attack(target, move_idx)
     stdscr.addstr(h, 5, f"{owner} {attacker.name} uses {attacker.moves[move_idx].get('name')} against {target.name}!")
-    stdscr.refresh()
-    time.sleep(2)
+    refresh_sleep(stdscr, 2)
     if players_turn:
         print_pythomon(stdscr, 3, 50, target, not players_turn, False)
     else:
         print_pythomon(stdscr, 3, 5, target, not players_turn, False)
     stdscr.addstr(h, 0, f"{' ' * w}")
     stdscr.addstr(h, 5, f"{target.name} took {attacker.base_atk + attacker.moves[move_idx].get('power')} damage!")
-    stdscr.refresh()
-    time.sleep(2)
+    refresh_sleep(stdscr, 2)
     return did_defeat
 
 def level_up_prompt(stdscr, h, w, player, players_pythomon, encounter):
     stdscr.addstr(h, 0, f"{' ' * w}")
     stdscr.addstr(h, 5, f"{players_pythomon.name} gained {encounter.exp_prize} EXP!")
-    stdscr.refresh()
-    time.sleep(2)
+    refresh_sleep(stdscr, 2)
     if players_pythomon.level_up(encounter.exp_prize):
         stdscr.addstr(h, 0, f"{' ' * w}")
         stdscr.addstr(h, 5, f"{players_pythomon.name} leveled up! Gained 3 MAX HP and ATK")
-        stdscr.refresh()
-        time.sleep(2)
+        refresh_sleep(stdscr, 2)
     stdscr.addstr(h, 0, f"{' ' * w}")
     stdscr.addstr(h, 5, f"Your team gains {encounter.exp_prize // 2} EXP!")
-    stdscr.refresh()
-    time.sleep(2)
+    refresh_sleep(stdscr, 2)
     for pythomon in player.pythomon:
         if pythomon == players_pythomon:
             continue
         elif pythomon.level_up(encounter.exp_prize // 2):
             stdscr.addstr(h, 0, f"{' ' * w}")
             stdscr.addstr(h, 5, f"{pythomon.name} leveled up! Gained 3 MAX HP and ATK")
-            stdscr.refresh()
-            time.sleep(2)
+            refresh_sleep(stdscr, 2)
 
 def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_owner):
     stdscr.addstr(h, 0, f"{' ' * w}")
     print_pythomon(stdscr, 3, 50, encounter, False, True)
     stdscr.addstr(h, 5, f"{player.name} defeated {encounter_owner} {encounter.name}!")
-    stdscr.refresh()
-    time.sleep(2)
+    refresh_sleep(stdscr, 2)
     stdscr.addstr(h, 0, f"{' ' * w}")
     stdscr.addstr(h, 5, f"You gained ${encounter.money_prize}!")
     player.money += encounter.money_prize
-    stdscr.refresh()
-    time.sleep(2)
+    refresh_sleep(stdscr, 2)
     level_up_prompt(stdscr, h, w, player, players_pythomon, encounter)
 
 def capture_prompts(stdscr, h, w, player, players_pythomon, item_idx, encounter, encounter_owner, engaged):
     if not engaged:
         stdscr.addstr(h, 0, f"{' ' * w}")
         stdscr.addstr(h, 5, "Must engaged in battle first!")
-        stdscr.refresh()
-        time.sleep(2)
+        refresh_sleep(stdscr, 2)
     elif encounter_owner != "Wild":
         stdscr.addstr(h, 0, f"{' ' * w}")
         stdscr.addstr(h, 5, "Can only use on Wild Pythomon!")
-        stdscr.refresh()
-        time.sleep(2)
+        refresh_sleep(stdscr, 2)
     else:
         player.bag.pop(item_idx)
         stdscr.addstr(h, 0, f"{' ' * w}")
         stdscr.addstr(h, 5, f"Attempted to capture Wild {encounter.name}!")
-        stdscr.refresh()
-        time.sleep(2)
+        refresh_sleep(stdscr, 2)
         if encounter.hp <= encounter.max_hp * 0.4:
             # success
             print_pythomon(stdscr, 3, 50, encounter, False, True)
             player.pythomon.append(encounter)
             stdscr.addstr(h, 0, f"{' ' * w}")
             stdscr.addstr(h, 5, f"You caught {encounter.name}!")
-            stdscr.refresh()
-            time.sleep(2)
+            refresh_sleep(stdscr, 2)
             level_up_prompt(stdscr, h, w, player, players_pythomon, encounter)
             return True
         else:
             stdscr.addstr(h, 0, f"{' ' * w}")
             stdscr.addstr(h, 5, f"{encounter.name} managed to escape!")
-            stdscr.refresh()
-            time.sleep(2)
+            refresh_sleep(stdscr, 2)
     return False
 
 def defeated_prompts(stdscr, h, w, player, defeated_pythomon, encounter, encounter_owner):
     print_pythomon(stdscr, 3, 5, defeated_pythomon, True, True)
     stdscr.addstr(h, 0, f"{' ' * w}")
     stdscr.addstr(h, 5, f"{encounter_owner} {encounter.name} defeated your {defeated_pythomon.name}!")
-    stdscr.refresh()
-    time.sleep(2)
+    refresh_sleep(stdscr, 2)
     if player.check_defeated():
         stdscr.addstr(h, 0, f"{' ' * w}")
         stdscr.addstr(h, 5, f"Your entire team is wiped out!")
-        stdscr.refresh()
-        time.sleep(3)
+        refresh_sleep(stdscr, 3)
         return True
     return False
 

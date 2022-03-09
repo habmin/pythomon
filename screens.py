@@ -1,5 +1,4 @@
 import curses
-import time
 import random
 import math
 from classes import *
@@ -188,8 +187,7 @@ def gameover(stdscr, h, w):
         stdscr.addstr((h // 2) - (10 - i), ((w // 2) - (len(line) // 2)), line)
         stdscr.attroff(curses.color_pair(2))
     stdscr.addstr((h // 2) + 2, ((w // 2) - (len(thanks) // 2)), thanks)
-    stdscr.refresh()
-    time.sleep(5)
+    refresh_sleep(stdscr, 5)
 
 def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engaged_menu):
     moves_selection = 0
@@ -574,8 +572,7 @@ def trainer_battle(stdscr, h, w, player):
     if len(player.trophies) < 3:
         stdscr.addstr(22, (w // 2) - (len(battle_text) // 2), battle_text)
     print_box(stdscr, h, w)
-    stdscr.refresh()
-    time.sleep(4)
+    refresh_sleep(stdscr, 4)
 
     init_menu = ["Fight", "Item"]
     engaged_menu = ["Attack", "Item", "Switch"]
@@ -598,8 +595,7 @@ def trainer_battle(stdscr, h, w, player):
     stdscr.addstr(21, (w // 2) - (len( won_money) // 2),  won_money)
     stdscr.addstr(22, (w // 2) - (len(next_battle) // 2), next_battle)
     print_box(stdscr, h, w)
-    stdscr.refresh()
-    time.sleep(4)
+    refresh_sleep(stdscr, 4)
     
     return True
 
