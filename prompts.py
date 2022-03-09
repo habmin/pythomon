@@ -15,7 +15,9 @@ def quit_prompt(stdscr):
         curses.endwin()
         exit(0)
 
-def print_menu_1(stdscr, h, w, menu, selection):
+def print_menu_1(stdscr, h, w, menu, selection, list_up_indicate = False, list_down_indicate = False):
+    if list_up_indicate:
+        stdscr.addstr(h, w - 2, "▲")
     for i, option in enumerate(menu):
         if i == selection:
             stdscr.attron(curses.color_pair(1))
@@ -23,9 +25,13 @@ def print_menu_1(stdscr, h, w, menu, selection):
             stdscr.attroff(curses.color_pair(1))
         else:
             stdscr.addstr(h + i, w, option)
+    if list_down_indicate:
+        stdscr.addstr(h + 3, w - 2, "▼")
 
-def print_menu_select_pythomon(stdscr, h, w, menu, selection):
+def print_menu_select_pythomon(stdscr, h, w, menu, selection, list_down_indicate, list_up_indicate):
     stdscr.addstr(h, w - 5, ">")
+    if list_up_indicate:
+        stdscr.addstr(h, w - 2, "▲")
     for i, option in enumerate(menu):
         blank_space = ' ' * (16 - len(option.name))
         if i == selection:
@@ -34,6 +40,8 @@ def print_menu_select_pythomon(stdscr, h, w, menu, selection):
             stdscr.attroff(curses.color_pair(1))
         else:
             stdscr.addstr(h + i, w, f"{option.name}{blank_space}HP:{option.hp}/{option.max_hp}")
+    if list_down_indicate:
+        stdscr.addstr(h + 3, w - 2, "▼")
 
 def print_menu_center(stdscr, h, w, menu, selection):
     for i, option in enumerate(menu):
@@ -53,7 +61,7 @@ def print_heal_menu(stdscr, h, w, h_menu, h_selection, h_start, h_end, h_max, it
             stdscr.addstr(h, w, "All Pythomon are at MAX HP")
         stdscr.attroff(curses.color_pair(1))
     else:
-        print_menu_select_pythomon(stdscr, h, w, h_menu[h_start:min(h_end, h_max)], h_selection)
+        print_menu_select_pythomon(stdscr, h, w, h_menu, h_selection, h_end < h_max, h_start > 0)
 
 def print_pythomon(stdscr, h, w, pythomon, player_ownership, dead):
     for i, line in enumerate(pythomon.art):

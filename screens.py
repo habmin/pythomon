@@ -204,6 +204,7 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
     item_end_range = item_start_range + min(len(player.bag), 4)
     item_max_range = len(player.bag)
     health_selection = 0
+    damaged_start_range = 0
     # 1 starts with players turn
     turn = 1
     deployed = False
@@ -248,7 +249,7 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                 else:
                     print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
 
-                print_menu_select_pythomon(stdscr, 19, 20, player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)], pythodeck_selection)
+                print_menu_select_pythomon(stdscr, 19, 20, player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)], pythodeck_selection, pytho_end_range < pytho_max_range, pytho_start_range > 0)
 
                 keypress = stdscr.getch()
                 if keypress == ord('q'):
@@ -271,6 +272,10 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                         mode = "Engaged"
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and player.pythomon[pythodeck_selection + pytho_start_range].status == "alive":
                     pytho_select_index = pythodeck_selection + pytho_start_range
+                    pythodeck_selection = 0
+                    pytho_start_range = 0
+                    pytho_end_range = pytho_start_range + min(len(player.pythomon), 4)
+                    pytho_max_range = len(player.pythomon)
                     deployed = True
                     mode = "Engaged"
 
@@ -288,7 +293,7 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                     stdscr.addstr(19, 20, "No Items")
                     stdscr.attroff(curses.color_pair(1))
                 else:
-                    print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection)
+                    print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
     
                 keypress = stdscr.getch()
                 if keypress == ord('q'):
@@ -327,10 +332,8 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                     damaged_pythomon = list(filter(lambda pythomon: pythomon.status == "dead", player.pythomon))
                 else:
                     damaged_pythomon = list(filter(lambda pythomon: pythomon.hp < pythomon.max_hp and pythomon.status == "alive", player.pythomon))
-                damaged_start_range = 0
                 damaged_end_range = damaged_start_range + min(len(damaged_pythomon), 4)
-                damaged_max_range = len(damaged_pythomon)
-                
+                damaged_max_range = len(damaged_pythomon)         
                 # print initial menu
                 if mode == "Start-Heal":
                     print_menu_1(stdscr, 19, 5, init_menu, init_selection)
@@ -338,7 +341,7 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                     print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
                 # print start-item menu
                 stdscr.addstr(19, 15, ">")
-                print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection)
+                print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
                 # print heal menu
                 stdscr.addstr(19, 37, ">")
                 print_heal_menu(stdscr, 19, 42, damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)], health_selection, damaged_start_range, damaged_end_range, damaged_max_range, player.bag[item_selection + item_start_range])
@@ -369,7 +372,10 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                         damaged_pythomon[health_selection + damaged_start_range].heal(20)
                     else:
                         damaged_pythomon[health_selection + damaged_start_range].heal(50)
+                    health_selection = 0
+                    damaged_start_range = 0
                     player.bag.pop(item_selection + item_start_range)
+                    item_selection = 0
                     item_start_range = 0
                     item_end_range = item_start_range + min(len(player.bag), 4)
                     item_max_range = len(player.bag)
