@@ -96,9 +96,10 @@ def level_up_prompt(stdscr, h, w, player, players_pythomon, encounter):
         stdscr.addstr(h, 0, f"{' ' * w}")
         stdscr.addstr(h, 5, f"{players_pythomon.name} leveled up! Gained 3 MAX HP and ATK")
         refresh_sleep(stdscr, 2)
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    stdscr.addstr(h, 5, f"Your team gains {encounter.exp_prize // 2} EXP!")
-    refresh_sleep(stdscr, 2)
+    if len(player.pythomon) > 1:
+        stdscr.addstr(h, 0, f"{' ' * w}")
+        stdscr.addstr(h, 5, f"Your team gains {encounter.exp_prize // 2} EXP!")
+        refresh_sleep(stdscr, 2)
     for pythomon in player.pythomon:
         if pythomon == players_pythomon:
             continue

@@ -11,7 +11,6 @@ class Player:
         self.gender = gender
         self.nature = nature
         self.defeated = False
-        self.trophies = [trophy]
     
     def check_defeated(self):
         for pytho in self.pythomon:
@@ -52,7 +51,7 @@ class Pythomon:
             if self.status == "alive":
                 self.hp = self.max_hp
                 self.healthbar = "████████████████████"
-            self.exp = 100 - self.exp
+            self.exp -= 100
             return True
         return False
     

@@ -330,12 +330,12 @@ def trainer_battle(stdscr, h, w, player):
 
     print_trainer(stdscr, 1, w)
     won = f"You beat {trainer.name}!!"
-    if len(player.trophies) < 4:
-        won_money = f"You gained ${trainer.money}"
-        next_battle = "Get ready for the next trainer!"
+    won_money = f"You gained ${trainer.money}"
+    next_battle = "Get ready for the next trainer!"
     stdscr.addstr(20, (w // 2) - (len(won) // 2), won)
-    stdscr.addstr(21, (w // 2) - (len( won_money) // 2),  won_money)
-    stdscr.addstr(22, (w // 2) - (len(next_battle) // 2), next_battle)
+    if len(player.trophies) < 4:
+        stdscr.addstr(21, (w // 2) - (len(won_money) // 2),  won_money)
+        stdscr.addstr(22, (w // 2) - (len(next_battle) // 2), next_battle)
     print_box(stdscr, h, w)
     refresh_sleep(stdscr, 4)
     
