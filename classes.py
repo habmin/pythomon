@@ -7,12 +7,22 @@ class Player:
         self.name = name
         self.money = 100
         self.pythomon = [starter]
-        self.bag = ["Health Spray", "Health Spray", "Capture Ball"]
+        self.bag = ["Health Spray", "Health Spray", "Capture Ball", "Revive", "Health Drink"
+            ,"Health Spray", "Health Spray", "Capture Ball", "Revive", "Health Drink"
+        ]
         self.gender = gender
         self.nature = nature
         self.defeated = False
         self.trophies = [trophy]
-    
+
+        for i in range(1, 10):
+            self.pythomon.append(Pythomon(pythodeck[i]))
+
+        for pythomon in self.pythomon:
+            pythomon.hp -= 10
+
+        self.pythomon[0].base_atk = 200
+
     def check_defeated(self):
         for pytho in self.pythomon:
             if pytho.status == "alive":
@@ -73,6 +83,7 @@ class Pythomon:
     def revive(self):
         self.status = "alive"
         self.hp = self.max_hp // 2
+        self.healthbar = ("█" * int(((self.hp / self.max_hp) * 20))) + ("░" * (20 - int(((self.hp / self.max_hp) * 20))))
         
 class Trainer:
     def __init__(self, name, pythomon, money, prize, about):

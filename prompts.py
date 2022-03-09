@@ -10,8 +10,8 @@ def refresh_sleep(stdscr, sec):
     curses.flushinp()
 
 # Helper/shorthand function when player wishes to quit
-def quit_prompt(stdscr):
-    stdscr.addstr(0, 0, "Are you sure you want to Quit? Press 'y' to confirm, otherwise press any other key to cancel")
+def quit_prompt(stdscr, h, w, g_h, g_w):
+    stdscr.addstr((h // 2) - (g_h // 2), ((w // 2) - (g_w // 2)), "Are you sure you want to Quit? Press 'y' to confirm, otherwise press any other key to cancel")
     keypress = stdscr.getch()
     if keypress == ord('y'):
         curses.curs_set(1)
@@ -91,17 +91,23 @@ def print_pythomon(stdscr, h, w, pythomon, player_ownership, dead):
     stdscr.addstr(h + 11, w, f"HP: {pythomon.healthbar}")
 
 def strike_animation(stdscr, h, w, pythomon, player_ownership):
+    # Each frame is the width offset
     for i, offset in enumerate([0, 1, 2, 5, 2, 1, 0]):
+
+        # Clear the space the pythomon animation will take place
         for j, line in enumerate(pythomon.art):
             if player_ownership:
                 stdscr.addstr(j + h, w, (' ' * (len(line) + 5)))
             else:
                 stdscr.addstr(j + h, w - 5, (' ' * (len(line) + 5)))
+
+        # Print the pythomon, with each frame using the offset
         for k, line in enumerate(pythomon.art):
             if player_ownership:
                 stdscr.addstr(k + h, w + offset, line)
             else:
                 stdscr.addstr(k + h, w - offset, line[::-1])
+
         refresh_sleep(stdscr, 0.04)
 
 def shake_pythomon(stdscr, h, w, pythomon, player_ownership):
@@ -128,98 +134,103 @@ def shake_pythomon(stdscr, h, w, pythomon, player_ownership):
 def attack_prompts(stdscr, h, w, owner, attacker, move_idx, target, players_turn):
     # If the attacker defeats the targer, returns True
     did_defeat = attacker.attack(target, move_idx)
-    stdscr.addstr(h, 5, f"{owner} {attacker.name} uses {attacker.moves[move_idx].get('name')} against {target.name}!")
+    stdscr.addstr(h, w, f"{' ' * 72}")
+    stdscr.addstr(h, w, f"{owner} {attacker.name} uses {attacker.moves[move_idx].get('name')} against {target.name}!")
     refresh_sleep(stdscr, 1)
     if players_turn:
-        strike_animation(stdscr, 3, 5, attacker, players_turn)
-        shake_pythomon(stdscr, 3, 50, target, not players_turn)
-        print_pythomon(stdscr, 3, 50, target, not players_turn, False)
+        strike_animation(stdscr, h - 13, w - 5 + 13, attacker, players_turn)
+        shake_pythomon(stdscr, h - 13, w - 5 + 55, target, not players_turn)
+        print_pythomon(stdscr, h - 13, w - 5 + 55, target, not players_turn, False)
     else:
-        strike_animation(stdscr, 3, 50, attacker, players_turn)
-        shake_pythomon(stdscr, 3, 5, target, not players_turn)
-        print_pythomon(stdscr, 3, 5, target, not players_turn, False)
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    stdscr.addstr(h, 5, f"{target.name} took {attacker.base_atk + attacker.moves[move_idx].get('power')} damage!")
+        strike_animation(stdscr, h - 13, w - 5 + 55, attacker, players_turn)
+        shake_pythomon(stdscr, h - 13, w - 5 + 13, target, not players_turn)
+        print_pythomon(stdscr, h - 13, w - 5 + 13, target, not players_turn, False)
+    stdscr.addstr(h, w, f"{' ' * 72}")
+    stdscr.addstr(h, w, f"{target.name} took {attacker.base_atk + attacker.moves[move_idx].get('power')} damage!")
     refresh_sleep(stdscr, 2)
     return did_defeat
 
-# Levels up if player wins a bttle
+# Levels up if player wins a battle
 def level_up_prompt(stdscr, h, w, player, players_pythomon, encounter):
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    stdscr.addstr(h, 5, f"{players_pythomon.name} gained {encounter.exp_prize} EXP!")
+    stdscr.addstr(h, w, f"{' ' * 72}")
+    stdscr.addstr(h, w, f"{players_pythomon.name} gained {encounter.exp_prize} EXP!")
     refresh_sleep(stdscr, 2)
     if players_pythomon.level_up(encounter.exp_prize):
-        stdscr.addstr(h, 0, f"{' ' * w}")
-        stdscr.addstr(h, 5, f"{players_pythomon.name} leveled up! Gained 3 MAX HP and ATK")
+        stdscr.addstr(h, w, f"{' ' * 72}")
+        stdscr.addstr(h, w, f"{players_pythomon.name} leveled up! Gained 3 MAX HP and ATK")
         refresh_sleep(stdscr, 2)
     
-    # If p,layer has more than one pythomon, will give half of th exp to the rest of the team
+    # If player has more than one pythomon, will give half of the exp to the rest of the team
     if len(player.pythomon) > 1:
-        stdscr.addstr(h, 0, f"{' ' * w}")
-        stdscr.addstr(h, 5, f"Your team gains {encounter.exp_prize // 2} EXP!")
+        stdscr.addstr(h, w, f"{' ' * 72}")
+        stdscr.addstr(h, w, f"Your team gains {encounter.exp_prize // 2} EXP!")
         refresh_sleep(stdscr, 2)
     for pythomon in player.pythomon:
         # Skips the pythomon that won the battle
         if pythomon == players_pythomon:
             continue
         elif pythomon.level_up(encounter.exp_prize // 2):
-            stdscr.addstr(h, 0, f"{' ' * w}")
-            stdscr.addstr(h, 5, f"{pythomon.name} leveled up! Gained 3 MAX HP and ATK")
+            stdscr.addstr(h, w, f"{' ' * 72}")
+            stdscr.addstr(h, w, f"{pythomon.name} leveled up! Gained 3 MAX HP and ATK")
             refresh_sleep(stdscr, 2)
 
 # Win prompt sequence, used when the player wins a battle
 def win_prompts(stdscr, h, w, player, players_pythomon, encounter, encounter_owner):
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    print_pythomon(stdscr, 3, 50, encounter, False, True)
-    stdscr.addstr(h, 5, f"{player.name} defeated {encounter_owner} {encounter.name}!")
+    print_pythomon(stdscr, h - 13, w - 5 + 55, encounter, False, True)
+    stdscr.addstr(h, w, f"{' ' * 72}")
+    stdscr.addstr(h, w, f"{player.name} defeated {encounter_owner} {encounter.name}!")
     refresh_sleep(stdscr, 2)
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    stdscr.addstr(h, 5, f"You gained ${encounter.money_prize}!")
+    stdscr.addstr(h, w, f"{' ' * 72}")
+    stdscr.addstr(h, w, f"You gained ${encounter.money_prize}!")
     player.money += encounter.money_prize
     refresh_sleep(stdscr, 2)
     level_up_prompt(stdscr, h, w, player, players_pythomon, encounter)
 
-# Capture sequence and prompt.
-def capture_prompts(stdscr, h, w, player, players_pythomon, item_idx, encounter, encounter_owner, engaged):
+# Capture pythomon sequence and prompt
+def capture_prompts(stdscr, h, w, g_w, player, players_pythomon, item_idx, encounter, encounter_owner, engaged):
     # Checks to make sure player is engaged and is a wild pythomon (can't take a trainers pythomon!)
     if not engaged:
-        stdscr.addstr(h, 0, f"{' ' * w}")
-        stdscr.addstr(h, 5, "Must engaged in battle first!")
+        stdscr.addstr(h, w, f"{' ' * 72}")
+        stdscr.addstr(h, w, "Must engaged in battle first!")
         refresh_sleep(stdscr, 2)
     elif encounter_owner != "Wild":
-        stdscr.addstr(h, 0, f"{' ' * w}")
-        stdscr.addstr(h, 5, "Can only use on Wild Pythomon!")
+        stdscr.addstr(h, w, f"{' ' * 72}")
+        stdscr.addstr(h, w, "Can only use on Wild Pythomon!")
         refresh_sleep(stdscr, 2)
     else:
         player.bag.pop(item_idx)
-        stdscr.addstr(h, 0, f"{' ' * w}")
-        stdscr.addstr(h, 5, f"Attempted to capture Wild {encounter.name}!")
+        stdscr.addstr(h, w, f"{' ' * 72}")
+        stdscr.addstr(h, w, f"Attempted to capture Wild {encounter.name}!")
         refresh_sleep(stdscr, 2)
         if encounter.hp <= encounter.max_hp * 0.4:
             # success
-            print_pythomon(stdscr, 3, 50, encounter, False, True)
+            print_pythomon(stdscr, h - 13, w - 5 + 55, encounter, False, True)
             player.pythomon.append(encounter)
-            stdscr.addstr(h, 0, f"{' ' * w}")
-            stdscr.addstr(h, 5, f"You caught {encounter.name}!")
+            stdscr.addstr(h, w, f"{' ' * 72}")
+            stdscr.addstr(h, w, f"You caught {encounter.name}!")
+            refresh_sleep(stdscr, 2)
+            stdscr.addstr(h, w, f"{' ' * 72}")
+            stdscr.addstr(h, w, f"You gained ${encounter.money_prize}!")
+            player.money += encounter.money_prize
             refresh_sleep(stdscr, 2)
             level_up_prompt(stdscr, h, w, player, players_pythomon, encounter)
             return True
         else:
-            stdscr.addstr(h, 0, f"{' ' * w}")
-            stdscr.addstr(h, 5, f"{encounter.name} managed to escape!")
+            stdscr.addstr(h, w, f"{' ' * 72}")
+            stdscr.addstr(h, w, f"{encounter.name} managed to escape!")
             refresh_sleep(stdscr, 2)
     return False
 
 # Defeat sequence and prompt
 def defeated_prompts(stdscr, h, w, player, defeated_pythomon, encounter, encounter_owner):
-    print_pythomon(stdscr, 3, 5, defeated_pythomon, True, True)
-    stdscr.addstr(h, 0, f"{' ' * w}")
-    stdscr.addstr(h, 5, f"{encounter_owner} {encounter.name} defeated your {defeated_pythomon.name}!")
+    print_pythomon(stdscr, h - 13, w - 5 + 13, defeated_pythomon, True, True)
+    stdscr.addstr(h, w, f"{' ' * 72}")
+    stdscr.addstr(h, w, f"{encounter_owner} {encounter.name} defeated your {defeated_pythomon.name}!")
     refresh_sleep(stdscr, 2)
     # If player's team is wiped out, the player is completed defeated
     if player.check_defeated():
-        stdscr.addstr(h, 0, f"{' ' * w}")
-        stdscr.addstr(h, 5, f"Your entire team is wiped out!")
+        stdscr.addstr(h, w, f"{' ' * 72}")
+        stdscr.addstr(h, w, f"Your entire team is wiped out!")
         refresh_sleep(stdscr, 3)
         return True
     return False
@@ -230,10 +241,10 @@ def print_trainer(stdscr, h, w):
         stdscr.addstr(h + i, (w // 2) - (len(line)// 2), line)
 
 # Prints a double line box around the terminal's dimensions
-def print_box(stdscr, h, w):
-    line = "═" * (w - 2)
-    stdscr.addstr(0, 0, f"╔{line}╗")
-    for i in range(h - 3):
-        stdscr.addstr(i + 1, 0, "║")
-        stdscr.addstr(i + 1, w - 1, "║")
-    stdscr.addstr(h - 2, 0, f"╚{line}╝")
+def print_box(stdscr, h, w, g_h, g_w):
+    line = "═" * (g_w - 2)
+    stdscr.addstr((h // 2) - (g_h // 2), (w // 2) - (g_w // 2), f"╔{line}╗")
+    for i in range(g_h - 2):
+        stdscr.addstr((h // 2) - (g_h // 2) + i + 1, (w // 2) - (g_w // 2), "║")
+        stdscr.addstr((h // 2) - (g_h // 2) + i + 1, (w // 2) + ((g_w // 2) - 1), "║")
+    stdscr.addstr((h // 2) + (g_h // 2) - 1, (w // 2) - (g_w // 2), f"╚{line}╝")

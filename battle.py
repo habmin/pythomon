@@ -3,7 +3,7 @@ import random
 
 from prompts import *
 
-def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engaged_menu):
+def battle(stdscr, h, w, g_h, g_w, player, pythomon_target, target_owner, init_menu, engaged_menu):
     # Menu selectors and range handlers for different menus
     
     # For attack moves selection/menu
@@ -47,23 +47,27 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
 
         stdscr.clear()
 
+        print_box(stdscr, h, w, g_h, g_w)
+
+        g_h_offset = (h // 2) - (g_h // 2)
+
         # print encountered pythomon until dead
-        print_pythomon(stdscr, 3, 50, pythomon_target, False, False)
+        print_pythomon(stdscr, g_h_offset + 2, ((w // 2) + (g_w // 2)) - 37, pythomon_target, False, False)
         
         # Print player's pythomon once selected/deployed
         if deployed:
-            print_pythomon(stdscr, 3, 5, player.pythomon[pytho_select_index], True, False)
+            print_pythomon(stdscr, g_h_offset + 2, ((w // 2) - (g_w // 2)) + 13, player.pythomon[pytho_select_index], True, False)
 
         # Players turn
         if turn % 2 == 1:
             # Initial start of encounter mode
             if mode == "Start":
                 # Print initial menu
-                print_menu_1(stdscr, 19, 5, init_menu, init_selection)
+                print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 5, init_menu, init_selection)
                 
                 keypress = stdscr.getch()
                 if keypress == ord('q'):
-                    quit_prompt(stdscr)
+                    quit_prompt(stdscr, h, w, g_h, g_w)
 
                 elif keypress == curses.KEY_UP and init_selection > 0:
                     init_selection -= 1
@@ -80,21 +84,21 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
             elif mode == "Select Pythomon" or mode == "Switch":
                 # Print initial menu selection if selecting pythomon
                 if mode == "Select Pythomon":
-                    print_menu_1(stdscr, 19, 5, init_menu, init_selection)
+                    print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 5, init_menu, init_selection)
                 # Print engaged menu if switching out pythomon
                 else:
-                    print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
+                    print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 5, engaged_menu, init_selection)
                 
                 # Print pythomon selection menu
                 # Trims to at most 4 selection options based on the start and end ranges
                 # The last two arguements will print scroll indicators if there's more options for
                 # the player to choose from their total pythodeck
-                print_menu_select_pythomon(stdscr, 19, 20, player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)], pythodeck_selection, pytho_end_range < pytho_max_range, pytho_start_range > 0)
+                print_menu_select_pythomon(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 20, player.pythomon[pytho_start_range:min(pytho_end_range, pytho_max_range)], pythodeck_selection, pytho_end_range < pytho_max_range, pytho_start_range > 0)
 
                 # Keyboard listerners/handlers
                 keypress = stdscr.getch()
                 if keypress == ord('q'):
-                    quit_prompt(stdscr)   
+                    quit_prompt(stdscr, h, w, g_h, g_w)   
 
                 elif keypress == curses.KEY_UP and pythodeck_selection > 0:
                     pythodeck_selection -= 1
@@ -125,26 +129,26 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
             # Item selection menu
             elif mode == "Start-Item" or mode == "Engaged-Item":
                 if mode == "Start-Item":
-                    print_menu_1(stdscr, 19, 5, init_menu, init_selection)
+                    print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 5, init_menu, init_selection)
                 else:
-                    print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
+                    print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 5, engaged_menu, init_selection)
 
-                stdscr.addstr(19, 15, ">")
+                stdscr.addstr(g_h_offset + 17, ((w // 2) - (g_w // 2)) + 15, ">")
                 # Indicate if player has no items
                 if len(player.bag) == 0:
                     stdscr.attron(curses.color_pair(1))
-                    stdscr.addstr(19, 20, "No Items")
+                    stdscr.addstr( g_h_offset + 17, ((w // 2) - (g_w // 2)) + 20, "No Items")
                     stdscr.attroff(curses.color_pair(1))
                 # otherwise, Print item selection menu
                 # Trims to at most 4 selection options based on the start and end ranges
                 # The last two arguements will print scroll indicators if there's more options for
                 # the player to choose from their total bag
                 else:
-                    print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
+                    print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
     
                 keypress = stdscr.getch()
                 if keypress == ord('q'):
-                    quit_prompt(stdscr)     
+                    quit_prompt(stdscr, h, w, g_h, g_w)     
             
                 elif keypress == curses.KEY_UP and item_selection > 0:
                     item_selection -= 1
@@ -164,9 +168,9 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and len(player.bag) != 0:
                     if player.bag[item_selection + item_start_range] == "Capture Ball":
                         if mode == "Start-Item":
-                            capture_prompts(stdscr, 17, w, player, None, item_selection + item_start_range, pythomon_target, target_owner, False)
+                            capture_prompts(stdscr, g_h_offset + 15, ((w // 2) - (g_w // 2)) + 5, g_w, player, None, item_selection + item_start_range, pythomon_target, target_owner, False)
                         else:
-                            if capture_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], item_selection + item_start_range, pythomon_target, target_owner, True):
+                            if capture_prompts(stdscr, g_h_offset + 15, ((w // 2) - (g_w // 2)) + 5, g_w, player, player.pythomon[pytho_select_index], item_selection + item_start_range, pythomon_target, target_owner, True):
                                 break
                     else:
                         if mode == "Start-Item":
@@ -189,20 +193,20 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                 
                 
                 if mode == "Start-Heal":
-                    print_menu_1(stdscr, 19, 5, init_menu, init_selection)
+                    print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 5, init_menu, init_selection)
                 else:
-                    print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
+                    print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 5, engaged_menu, init_selection)
 
                 # print item menu
-                stdscr.addstr(19, 15, ">")
-                print_menu_1(stdscr, 19, 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
+                stdscr.addstr(g_h_offset + 17, ((w // 2) - (g_w // 2)) + 15, ">")
+                print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 20, player.bag[item_start_range:min(item_end_range, item_max_range)], item_selection, item_start_range > 0, item_end_range < item_max_range)
+                
                 # print heal menu
-                stdscr.addstr(19, 37, ">")
-                print_heal_menu(stdscr, 19, 42, damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)], health_selection, damaged_start_range, damaged_end_range, damaged_max_range, player.bag[item_selection + item_start_range])
+                print_heal_menu(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 41, damaged_pythomon[damaged_start_range:min(damaged_end_range, damaged_max_range)], health_selection, damaged_start_range, damaged_end_range, damaged_max_range, player.bag[item_selection + item_start_range])
                 
                 keypress = stdscr.getch()
                 if keypress == ord('q'):
-                    quit_prompt(stdscr)     
+                    quit_prompt(stdscr, h, w, g_h, g_w)     
             
                 elif keypress == curses.KEY_UP and health_selection > 0:
                     health_selection -= 1
@@ -244,11 +248,11 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
             
             elif mode == "Engaged":                
                 # Print menu option for engaged mode
-                print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
+                print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 5, engaged_menu, init_selection)
 
                 keypress = stdscr.getch()
                 if keypress == ord('q'):
-                    quit_prompt(stdscr)     
+                    quit_prompt(stdscr, h, w, g_h, g_w)     
             
                 elif keypress == curses.KEY_UP and init_selection > 0:
                     init_selection -= 1
@@ -265,20 +269,21 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                 
             elif mode == "Attack":
                 # Print menu option for engaged mode
-                print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
-                stdscr.addstr(19, 15, ">")
+                print_menu_1(stdscr, g_h_offset + 17, ((w // 2) - (g_w // 2)) + 5, engaged_menu, init_selection)
+                
+                stdscr.addstr(g_h_offset + 17, ((w // 2) - (g_w // 2)) + 15, ">")
                 for i, option in enumerate(player.pythomon[pytho_select_index].moves):
                     blank_space = ' ' * (16 - len(option["name"]))
                     if i == moves_selection:
                         stdscr.attron(curses.color_pair(1))
-                        stdscr.addstr((19) + i, 20, "{}{}POW:{}".format(option["name"], blank_space, option["power"]))
+                        stdscr.addstr((g_h_offset + 17) + i, ((w // 2) - (g_w // 2)) + 20, "{}{}POW:{}".format(option["name"], blank_space, option["power"]))
                         stdscr.attroff(curses.color_pair(1))
                     else:
-                        stdscr.addstr((19) + i, 20, "{}{}POW:{}".format(option["name"], blank_space, option["power"]))
+                        stdscr.addstr((g_h_offset + 17) + i, ((w // 2) - (g_w // 2)) + 20, "{}{}POW:{}".format(option["name"], blank_space, option["power"]))
 
                 keypress = stdscr.getch()
                 if keypress == ord('q'):
-                    quit_prompt(stdscr)     
+                    quit_prompt(stdscr, h, w, g_h, g_w)     
             
                 elif keypress == curses.KEY_UP and moves_selection > 0:
                     moves_selection -= 1
@@ -288,8 +293,8 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                     mode = "Engaged"
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
                     # Commence attack! Returns true if target is defeated
-                    if attack_prompts(stdscr, 17, w, f"{player.name}'s", player.pythomon[pytho_select_index], moves_selection, pythomon_target, True):
-                        win_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], pythomon_target, target_owner)
+                    if attack_prompts(stdscr, g_h_offset + 15, ((w // 2) - (g_w // 2)) + 5, f"{player.name}'s", player.pythomon[pytho_select_index], moves_selection, pythomon_target, True):
+                        win_prompts(stdscr, g_h_offset + 15, ((w // 2) - (g_w // 2)) + 5, player, player.pythomon[pytho_select_index], pythomon_target, target_owner)
                         # exit encounter
                         break
                     else:
@@ -299,9 +304,9 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
         # computer's turn
         else:
             # If player's pythomon is killed, returns true
-            if attack_prompts(stdscr, 17, w, target_owner, pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pytho_select_index], False):
+            if attack_prompts(stdscr, g_h_offset + 15, ((w // 2) - (g_w // 2)) + 5, target_owner, pythomon_target, random.randint(0, len(pythomon_target.moves) - 1), player.pythomon[pytho_select_index], False):
                 # If player's entire team is dead, the player loses and returns True
-                if defeated_prompts(stdscr, 17, w, player, player.pythomon[pytho_select_index], pythomon_target, target_owner):
+                if defeated_prompts(stdscr, g_h_offset + 15, ((w // 2) - (g_w // 2)) + 5, player, player.pythomon[pytho_select_index], pythomon_target, target_owner):
                     return True
                 # Otherwise, player can send out another pythomon
                 else:

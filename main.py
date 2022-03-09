@@ -32,6 +32,13 @@ def game_start(stdscr):
     # --- curses initializers ---
     curses.curs_set(0)                  # turn off cursor
     height, width = stdscr.getmaxyx()   # get terminal window height and width
+    game_height = 25
+    game_width = 92
+    
+    # Check to see if terminal window is minimum resolution for game
+    if height < 25 or width < 92:
+        raise Exception(f"Your terminal window dimensions are {height} X {width}. Must be at least {game_height} X {game_width}.")
+    
 
     # 1: Black Font, White Background
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
@@ -50,10 +57,10 @@ def game_start(stdscr):
     # after starting game and creating a player
     while True:
         # Start Splash Screen
-        start_screen(stdscr, height, width)
+        start_screen(stdscr, height, width, game_height, game_width)
 
         # Create Player Screen
-        player = create_player(stdscr, height, width)
+        player = create_player(stdscr, height, width, game_height, game_width)
 
         # Gameplay loop:
         # Breaks when player wins with having all four tropies
@@ -81,23 +88,24 @@ def game_start(stdscr):
 
                 if grid[player_y][player_x].terrain == "encounter":
                     # Returns true if player loses
-                    if encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]), "Wild"):
+                    if encounter(stdscr, height, width, game_height, game_width, player, Pythomon(pythodeck[random.randint(4, 23)]), "Wild"):
                         break
                     # Respawns new encounter locations
                     grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
                     stdscr.clear()
                 
                 elif grid[player_y][player_x].terrain == "store":
-                    print_store(stdscr, height, width, player, store)
+                    print_store(stdscr, height, width, game_height, game_width, player, store)
                     stdscr.clear()
 
                 elif grid[player_y][player_x].terrain == "trainer":
-                    trainer_battle(stdscr, height, width, player)
+                    trainer_battle(stdscr, height, width, game_height, game_width, player)
                     stdscr.clear()
                     break
 
                 # Prints grid if player lands on grass
-                print_grid(stdscr, height, width, grid, player)
+                print_box(stdscr, height, width, game_height, game_width)
+                print_grid(stdscr, height, width, game_height, game_width, grid, player)
 
                 # Keyboard listeners and handlers
                 keypress = stdscr.getch()
@@ -124,14 +132,14 @@ def game_start(stdscr):
                     grid[player_y][player_x].player_occupied = True
                 # Presses 'q' for quit
                 elif keypress == ord('q'):
-                    quit_prompt(stdscr)
+                    quit_prompt(stdscr, height, width, game_height, game_width)
 
                 stdscr.refresh()
     
         if not player.defeated:
-            print_victory(stdscr, height, width)
+            print_victory(stdscr, height, width, game_height, game_width)
         else:
-            gameover_screen(stdscr, height, width)
+            gameover_screen(stdscr, height, width, game_height, game_width)
     # Done with game, reset curs_set and end
     curses.curs_set(1)
     curses.endwin()
