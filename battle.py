@@ -1,27 +1,47 @@
 import curses
 import random
+
 from prompts import *
 
 def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engaged_menu):
+    # Menu selectors and range handlers for different menus
+    
+    # For attack moves selection/menu
     moves_selection = 0
+
+    # For initial/engaged menu selection/menu
     init_selection = 0
-    item_selection = 0
-    mode = "Start"
-    keypress = 0
+
+    # For selecting and switching out pythomon selection/menu
     pythodeck_selection = 0
     pytho_start_range = 0
     pytho_end_range = pytho_start_range + min(len(player.pythomon), 4)
     pytho_max_range = len(player.pythomon)
+    # Stores the index for current selected pythomon
     pytho_select_index = 0
+
+    # For item selection/menu
+    item_selection = 0
     item_start_range = 0
     item_end_range = item_start_range + min(len(player.bag), 4)
     item_max_range = len(player.bag)
+
+    # For deciding which pythomon to heal selection/menu
     health_selection = 0
     damaged_start_range = 0
-    # 1 starts with players turn
+
+    # Begin with 'Start' mode
+    mode = "Start"
+    # keypress handler
+    keypress = 0
+    # 1 starts with players turn, every odd turn is the players
     turn = 1
+    # Used to show deployed pythomon or not
     deployed = False
+
+    # Loops until target pythomon is defeated
     while pythomon_target.hp > 0:
+
         stdscr.clear()
 
         # print encountered pythomon until dead
@@ -34,8 +54,6 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
         # Players turn
         if turn % 2 == 1:
             # Initial start of encounter mode
-            
-            # Engaged mode (selected a pythomon)
             if mode == "Start":
                 # Print initial menu
                 print_menu_1(stdscr, 19, 5, init_menu, init_selection)
@@ -54,11 +72,13 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                     mode = "Start-Item"
                 elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and init_menu[init_selection] == "Run":
                     break
-
+            
+            # Selection or switching out pokemon
             elif mode == "Select Pythomon" or mode == "Switch":
-                # Print initial menu
+                # Print initial menu selection if selecting pythomon
                 if mode == "Select Pythomon":
                     print_menu_1(stdscr, 19, 5, init_menu, init_selection)
+                # Print engaged menu if switching out pythomon
                 else:
                     print_menu_1(stdscr, 19, 5, engaged_menu, init_selection)
 
@@ -91,10 +111,8 @@ def battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engag
                     pytho_max_range = len(player.pythomon)
                     deployed = True
                     mode = "Engaged"
-
-                
+        
             elif mode == "Start-Item" or mode == "Engaged-Item":
-                # Print initial menu
                 if mode == "Start-Item":
                     print_menu_1(stdscr, 19, 5, init_menu, init_selection)
                 else:

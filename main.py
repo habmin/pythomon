@@ -1,12 +1,13 @@
 from sys import platform
 import random
+
 from classes import *
 
 def grid_maker(height, width, encounter_rate, store_row, store_col, player_x, player_y):
     # Create height by width grid and fill with Squares/Terrain
     grid = [[Square("grass") for i in range(width)] for j in range(height)]
 
-    # Player always starts in upper left
+    # Places player based on player x/y coordinates
     grid[player_y][player_x].player_occupied = True
 
     # Trainer is always in bottom right
@@ -19,6 +20,7 @@ def grid_maker(height, width, encounter_rate, store_row, store_col, player_x, pl
     for i in range(encounter_rate):
         random_row = random.randint(0, height - 1)
         random_col = random.randint(0, width - 1)
+        # Ensures placement is on unused terrain and not where player is located
         while grid[random_row][random_col].terrain != "grass" or grid[random_row][random_col].player_occupied == True:
             random_row = random.randint(0, height - 1)
             random_col = random.randint(0, width - 1)
@@ -36,24 +38,32 @@ def main(stdscr):
     # 2: Yellow Font, Blue Background (for Start Screen)
     curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLUE)
 
+    # create store
+    store = Store()
+
+    # Grid dimensions and rate
+    grid_height = 15
+    grid_width = 15
+    encounter_rate = 22
+
+    # Main loop, always run until user quits via pressing 'q'
+    # after starting game and creating a player
     while True:
         # Start Splash Screen
         start_screen(stdscr, height, width)
 
-        # Create Player
+        # Create Player Screen
         player = create_player(stdscr, height, width)
-        # Create grid
-        grid_height = 15
-        grid_width = 15
-        encounter_rate = 22
-        
-        # create store
-        store = Store()
+
+        # Gameplay loop:
+        # Breaks when player wins with having all four tropies
+        # Or when their team is fully defeated in battle
         while len(player.trophies) < 4 and not player.defeated:
             # Player's coordinates
             player_x = 0
             player_y = 0
-            # Randomly place one store
+
+            # Randomly place one store; find coordinates
             store_row = random.randint(0, grid_height - 1)
             store_col = random.randint(0, grid_width - 1)
             # Make sure location is not the starting player position or Trainer position
@@ -61,12 +71,19 @@ def main(stdscr):
                 store_row = random.randint(0, grid_height - 1)
                 store_col = random.randint(0, grid_width - 1)
             
+            # Create grid
             grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
+            
+            # Grid-movement loop
+            # Breaks when lost a battle and after battle with trianer
             while True:
                 stdscr.clear()
+
                 if grid[player_y][player_x].terrain == "encounter":
+                    # Returns true if player loses
                     if encounter(stdscr, height, width, player, Pythomon(pythodeck[random.randint(4, 23)]), "Wild"):
                         break
+                    # Respawns new encounter locations
                     grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
                     stdscr.clear()
                 
@@ -79,30 +96,38 @@ def main(stdscr):
                     stdscr.clear()
                     break
 
-                # print_box(stdscr, height, width)
+                # Prints grid if player lands on grass
                 print_grid(stdscr, height, width, grid, player)
 
+                # Keyboard listeners and handlers
                 keypress = stdscr.getch()
+
+                # Moves left
                 if keypress == curses.KEY_LEFT and not player_x == 0:
                     grid[player_y][player_x].player_occupied = False
                     player_x -= 1
                     grid[player_y][player_x].player_occupied = True
+                # Moves Right
                 elif keypress == curses.KEY_RIGHT and not player_x == grid_width - 1:
                     grid[player_y][player_x].player_occupied = False
                     player_x += 1
                     grid[player_y][player_x].player_occupied = True
+                # Moves up
                 elif keypress == curses.KEY_UP and not player_y == 0:
                     grid[player_y][player_x].player_occupied = False
                     player_y -= 1
                     grid[player_y][player_x].player_occupied = True
+                # Moves down
                 elif keypress == curses.KEY_DOWN and not player_y == grid_height - 1:
                     grid[player_y][player_x].player_occupied = False
                     player_y += 1
                     grid[player_y][player_x].player_occupied = True
+                # Presses 'q' for quit
                 elif keypress == ord('q'):
                     quit_prompt(stdscr)
 
                 stdscr.refresh()
+    
         if not player.defeated:
             print_victory(stdscr, height, width)
         else:
@@ -113,6 +138,9 @@ def main(stdscr):
     exit(0)
 
 if __name__ == "__main__":
+    # Check to make sure curses module is installed
+    # For windows systems, module used is windows-curses
+    # Not sure if mac/darwin system will be different, only tested it with linux/ubuntu
     try:
         import curses
         from screens import *
@@ -123,5 +151,7 @@ if __name__ == "__main__":
         else:
             print("Module 'curses' was not found, and is required to run pythomon")
             exit(1)
+    
+    # Run program after passed module check
     curses.wrapper(main)
                                                         

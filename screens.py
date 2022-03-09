@@ -1,9 +1,11 @@
 import curses
 import random
 import math
+
 from classes import *
 from prompts import *
 from battle import battle
+
 from assets import title
 from assets import gameover
 from assets import traits
@@ -64,6 +66,7 @@ def create_player(stdscr, h, w):
     trait_selection = 0
     starter_selection = 0
     keypress = 0
+
     while True:
         curses.curs_set(1)
         stdscr.clear()
@@ -157,6 +160,8 @@ def print_grid(stdscr, h, w, grid, player):
                 stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}Y{fill}")
             elif cell.terrain == "trainer":
                 stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}T{fill}")
+            # Commented out to keep encounter locations hidden
+            # Useful for testing
             # elif cell.terrain == "encounter":
             #     stdscr.addstr(1 + i, 2 + (3 * j), f"{fill}E{fill}")
             elif cell.terrain == "store":
@@ -171,7 +176,7 @@ def print_grid(stdscr, h, w, grid, player):
     # Create bottom line of grid box
     stdscr.addstr(len(grid) + 1, 1, f"╚{line}╝")
 
-    # Print info and instructions
+    # Print player info and instructions
     stdscr.addstr(4, (3 * len(grid[0])) + 7, f"{player.name}")
     stdscr.addstr(5, (3 * len(grid[0])) + 7, f"Money: ${player.money}")
     stdscr.addstr(6, (3 * len(grid[0])) + 7, f"Trophies: {len(player.trophies)}/4")
@@ -190,25 +195,31 @@ def gameover_screen(stdscr, h, w):
     stdscr.addstr((h // 2) + 2, ((w // 2) - (len(thanks) // 2)), thanks)
     refresh_sleep(stdscr, 5)
 
+# Used for 'Wild' encounter battles
+# Encounter menu is slightly different than battling with a trainer
 def encounter(stdscr, h, w, player, pythomon_target, target_owner):
     init_menu = ["Fight", "Item", "Run"]
     engaged_menu = ["Attack", "Item", "Switch", "Run"]
+
+    # If player is defeated, returns true, ensuring break from gameplay loop in main
     if battle(stdscr, h, w, player, pythomon_target, target_owner, init_menu, engaged_menu):
         return True
     return False
 
 def print_store(stdscr, h, w, player, store):
-
+    # Automatically heal any alive pokemon to max_hp
     for pythomon in player.pythomon:
         if pythomon.status == "alive":
             pythomon.heal(pythomon.max_hp)
 
+    # Player inventory display
     player_inventory = {
         "Health Spray": 0,
         "Health Drink": 0,
         "Revive": 0,
         "Capture Ball": 0,
     }
+    # Acculumates items to display
     for item in player.bag: 
         if item == "Health Spray":
             player_inventory["Health Spray"] += 1
@@ -219,50 +230,64 @@ def print_store(stdscr, h, w, player, store):
         elif item == "Capture Ball":
             player_inventory["Capture Ball"] += 1
 
+    # Creates display menu based on store's items
     menu = []
     for item in store.items:
         menu.append(item["name"])
+    # Appends Leave to curses display menu option
     menu.append("Leave")
 
+    # Menu curses selection
     selection = 0
+    # Flag to use when player tries to buy something without enough money
     not_enough = False
+
+    # Strings/text for store screen
+    greeting = "Welcome To The General Store!"
+    heal_text = "We've automatically healed all of your alive pythomon!"
+    money_text = f"You have ${player.money}"
+    not_enough_money_text = "You don't have enough money!"
+
     while True:
         stdscr.clear()
-
-        greeting = "Welcome To The General Store!"
-        heal_text = "We've automatically healed all of your alive pythomon!"
-        money_text = f"You have ${player.money}"
-        not_enough_money_text = "You don't have enough money!"
+        
         stdscr.addstr((h // 2) - 8, (w // 2) - (len(greeting) // 2), greeting)
         stdscr.addstr((h // 2) - 7, (w // 2) - (len(heal_text) // 2), heal_text)
         stdscr.addstr((h // 2) - 6, 0, f"{' ' * w}")
         stdscr.addstr((h // 2) - 6, (w // 2) - (len(money_text) // 2), money_text)
+
         if not_enough:
             stdscr.addstr((h // 2) - 4, (w // 2) - (len(not_enough_money_text) // 2), not_enough_money_text)
 
         for i, item in enumerate(menu):
+            # Blank space is used for every menu selection except the last ('Leave')
             if i != len(menu) - 1:
                 blank_space = ' ' * (16 - len(store.items[i]["name"]))
             if i == selection:
                 stdscr.attron(curses.color_pair(1))
+                # Print store items info unless loop is at last element ('Leave')
                 if i != len(menu) - 1:
                     stdscr.addstr((h // 2) + i, (w // 4) - 10, "{}{}${}".format(store.items[i]["name"], blank_space, store.items[i]["price"]))
                 else:
                     stdscr.addstr((h // 2) + i + 1, (w // 4) - 10, item)
                 stdscr.attroff(curses.color_pair(1))
             else:
+                # Print store items info unless loop is at last element ('Leave')
                 if i != len(menu) - 1:
                     stdscr.addstr((h // 2) + i, (w // 4) - 10, "{}{}${}".format(store.items[i]["name"], blank_space, store.items[i]["price"]))
                 else:
                     stdscr.addstr((h // 2) + i + 1, (w // 4) - 10, item)
-
+        
+        # Player's inventory
         stdscr.addstr((h // 2) - 2,  math.floor(w * .62), "Your inventory")
         for i, (key, value) in enumerate(player_inventory.items()):
             blank_space = ' ' * (12 - len(key))
             stdscr.addstr((h // 2) + i, math.floor(w * .62), f"{key}{blank_space} X {value}")
 
+        # Double lined box around terminal screen
         print_box(stdscr, h, w)
         
+        # Keyboard listeners/handlers
         keypress = stdscr.getch()
         if keypress == ord('q'):
             quit_prompt(stdscr)
@@ -274,6 +299,7 @@ def print_store(stdscr, h, w, player, store):
         elif (keypress == curses.KEY_ENTER or keypress in [10, 13]) and menu[selection] == "Leave":
             break
         elif (keypress == curses.KEY_ENTER or keypress in [10, 13]):
+            # Returns true if player has enough money to purchase item
             if player.buy(store.items[selection]):
                 not_enough = False
                 player_inventory[store.items[selection]["name"]] += 1
@@ -295,13 +321,14 @@ def trainer_battle(stdscr, h, w, player):
 
     # level up pythmon based on trophy amount
     for pythomon in trainers_pythomon:
-        pythomon.base_atk += len(player.trophies) * 7
-        pythomon.max_hp += len(player.trophies) * 7
+        pythomon.base_atk += len(player.trophies) * 8
+        pythomon.max_hp += len(player.trophies) * 8
         pythomon.hp = pythomon.max_hp
 
-    # create trainer
+    # creates trainer(selects a random name from assests, $100 * player's trophy amount, prize pythomon is the last one in trainer's pythodeck, selects a random blurb from assets)
     trainer = Trainer(trainer_names[random.randint(0, len(trainer_names) - 1)], trainers_pythomon, 100 * len(player.trophies), trainers_pythomon[len(trainers_pythomon) - 1], about_blurbs[random.randint(0, len(about_blurbs) - 1)])
 
+    # Intro screen for trainer
     print_trainer(stdscr, 1, w)
     incoming = f"Here comes {trainer.name}!!"
     about = f"About: {trainer.about}"
@@ -313,13 +340,15 @@ def trainer_battle(stdscr, h, w, player):
     print_box(stdscr, h, w)
     refresh_sleep(stdscr, 4)
 
+    # Battle menu different with trainers, player's can't run away!
     init_menu = ["Fight", "Item"]
     engaged_menu = ["Attack", "Item", "Switch"]
     for pythomon in trainer.pythomon:
-        # returns True if player is defeated during a battle
+        # returns True if player is defeated during a battle, finishing the function
         if battle(stdscr, h, w, player, pythomon, f"{trainer.name}'s", init_menu, engaged_menu):
             return
-
+    
+    # Player has won and reaps rewards, revives prize and add's to player's pythodeck and trophies, awards money
     trainer.pythomon[len(trainer.pythomon) - 1].revive()
     trainer.pythomon[len(trainer.pythomon) - 1].heal(trainer.pythomon[len(trainer.pythomon) - 1].max_hp)
     player.pythomon.append(trainer.pythomon[len(trainer.pythomon) - 1])
@@ -328,11 +357,13 @@ def trainer_battle(stdscr, h, w, player):
 
     stdscr.clear()
 
+    # Print post-victory screen
     print_trainer(stdscr, 1, w)
     won = f"You beat {trainer.name}!!"
     won_money = f"You gained ${trainer.money}"
     next_battle = "Get ready for the next trainer!"
     stdscr.addstr(20, (w // 2) - (len(won) // 2), won)
+    # Prints if you have another trainer to face
     if len(player.trophies) < 4:
         stdscr.addstr(21, (w // 2) - (len(won_money) // 2),  won_money)
         stdscr.addstr(22, (w // 2) - (len(next_battle) // 2), next_battle)
@@ -342,22 +373,32 @@ def trainer_battle(stdscr, h, w, player):
     return
 
 def print_victory(stdscr, h, w):
+    # Display text
+    congrats_text = "Congratulations! You are the Pythomon Master!"
+    play_again_text = "Press 'p' to play again, or 'q' to quit."
+
+    # Loops until player exits or starts another game
     while True:
         stdscr.clear()
+
+        # From assests
         for i, line in enumerate(congrats):
             stdscr.addstr(2 + i, (w // 2) - (len(line) // 2), line)
+
+        # Prints the four prize pythomon
         for i in range(len(pythodeck[0]["art"])):
             stdscr.addstr(9 + i, (w // 2) - 36, "{}{}{}{}".format(pythodeck[0]["art"][i], pythodeck[1]["art"][i], pythodeck[2]["art"][i], pythodeck[3]["art"][i]))
         
-        congrats_text = "Congratulations! You are the Pythomon Master!"
-        play_again_text = "Press 'p' to play again, or 'q' to quit."
         stdscr.addstr(20, (w // 2) - (len(congrats_text) // 2), congrats_text)
         stdscr.addstr(21, (w // 2) - (len(play_again_text) // 2), play_again_text)
+
         print_box(stdscr, h, w)
         
+        # Keyboard listeners/handlers
         keypress = stdscr.getch()
         if keypress == ord('q'):
             quit_prompt(stdscr)
         elif keypress == ord('p'):
             return
+
         stdscr.refresh()
