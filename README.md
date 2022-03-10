@@ -2,6 +2,7 @@
 ### *A Capture and Battle game you can play in your python terminal!*
 [![Video Demo](https://asciinema.org/a/475782.svg)](https://asciinema.org/a/475782)
 *Video Demo*
+
 *Longer demo [here](https://asciinema.org/a/475618)*
 
 ## Description
