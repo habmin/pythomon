@@ -79,8 +79,14 @@ To quit, press `q` anytime after creating a character and hit `y` to confirm.
         - Contains a dict with 4 items and their prices
 
 ## Gameplay
+
+![Player Creation Screen](player_creation.gif)
+
 - ### Player Creation
     Player creates their trainer, where they also select one of the four prized pythomon
+
+![Grid Movement](grid_movement.gif)
+
 - ### Grid Movement
     After creation, the play can move around the grid with the arrow keys. There are 5 different terrains the player can land on. The player is represented with a `Y`.
     1. Grass - Does nothing, player can freely move to adjacent tile
@@ -88,6 +94,9 @@ To quit, press `q` anytime after creating a character and hit `y` to confirm.
     3. Trainer - Represented with a `T` - Once the player enters this tile, the battle with the trainer will begin (and the player cannot leave!).
     4. Encounter - Hidden - When a player stumbles onto this tile, battle with a random wild pythomon start (though the player can freely leave). After the encounter, the encounter tiles respawn their locations.
     5. Item - Hidden - Player stumbles upon a nice surprise and is gifted with a random item or money! There are 5 for every level.
+
+![Battle](battle.gif)
+
 - ### Battle
     This is where the bulk of the gameplay takes place. The player is confronted with an opposing pythomon. The player will be faced with several initial choices:
     1. Choose which of their pythomon to deploy and engage in battle
