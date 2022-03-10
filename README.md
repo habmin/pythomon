@@ -1,7 +1,9 @@
 # 🐍 Pythomon 🐍
 ### *A Capture and Battle game you can play in your python terminal!*
-[![asciicast](https://asciinema.org/a/4z4rjFQ9GFfMUVgPPnf9TISVI.svg)](https://asciinema.org/a/4z4rjFQ9GFfMUVgPPnf9TISVI)
+[![Video Demo](https://asciinema.org/a/475782.svg)](https://asciinema.org/a/475782)
 *Video Demo*
+*Longer demo [here](https://asciinema.org/a/475618)*
+
 ## Description
 Pythomon is a text based, terminal game, where you could probably where it takes inspiration. I developed it for an Python homework assignment during my spring 2022 semester, when I was getting my undergraduate at Hunter College. You can read the spec requirements in [`pokemon_spec.txt`](/pokemon_spec.txt).
 
