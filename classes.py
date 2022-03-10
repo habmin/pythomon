@@ -11,7 +11,7 @@ class Player:
         self.gender = gender
         self.nature = nature
         self.defeated = False
-        self.trophies = [trophy, trophy]
+        self.trophies = [trophy]
 
     def check_defeated(self):
         for pytho in self.pythomon:
