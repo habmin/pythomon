@@ -343,8 +343,7 @@ def trainer_battle(stdscr, h, w, g_h, g_w, player):
     battle_text = "Get ready for battle!"
     stdscr.addstr(((h // 2) - (g_h // 2) + 20), (w // 2) - (len(incoming) // 2), incoming)
     stdscr.addstr(((h // 2) - (g_h // 2) + 21), (w // 2) - (len(about) // 2), about)
-    if len(player.trophies) < 3:
-        stdscr.addstr(((h // 2) - (g_h // 2) + 22), (w // 2) - (len(battle_text) // 2), battle_text)
+    stdscr.addstr(((h // 2) - (g_h // 2) + 22), (w // 2) - (len(battle_text) // 2), battle_text)
     refresh_sleep(stdscr, 4)
 
     # Battle menu different with trainers, player's can't run away!
