@@ -87,8 +87,14 @@ def game_start(stdscr):
                 stdscr.clear()
 
                 if grid[player_y][player_x].terrain == "encounter":
+                    # Create pythomon, change level based on amount of trophies a player has
+                    encounter_pythomon = Pythomon(pythodeck[random.randint(4, 23)])
+                    encounter_pythomon.base_atk += ((len(player.trophies) - 1) * 6)
+                    encounter_pythomon.max_hp += ((len(player.trophies) - 1) * 6)
+                    encounter_pythomon.hp = encounter_pythomon.max_hp
+
                     # Returns true if player loses
-                    if encounter(stdscr, height, width, game_height, game_width, player, Pythomon(pythodeck[random.randint(4, 23)]), "Wild"):
+                    if encounter(stdscr, height, width, game_height, game_width, player, encounter_pythomon, "Wild"):
                         break
                     # Respawns new encounter locations
                     grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
