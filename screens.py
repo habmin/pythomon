@@ -168,6 +168,8 @@ def print_grid(stdscr, h, w, g_h, g_w, grid, player):
             # Useful for testing
             # elif cell.terrain == "encounter":
             #     stdscr.addstr((h // 2) - (g_h // 2) + 2 + i, (w // 2) - (g_w // 2) + 2 + (3 * j), f"{fill}E{fill}")
+            # elif cell.terrain == "item":
+            #     stdscr.addstr((h // 2) - (g_h // 2) + 2 + i, (w // 2) - (g_w // 2) + 2 + (3 * j), f"{fill}I{fill}")
             elif cell.terrain == "store":
                 stdscr.addstr((h // 2) - (g_h // 2) + 2 + i, (w // 2) - (g_w // 2) + 2 + (3 * j), f"{fill}${fill}")
             # Choose grass type based on 'fill' type

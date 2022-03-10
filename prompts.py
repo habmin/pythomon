@@ -1,5 +1,6 @@
 import curses
 import time
+import random
 
 from assets import trainer_art
 
@@ -248,3 +249,20 @@ def print_box(stdscr, h, w, g_h, g_w):
         stdscr.addstr((h // 2) - (g_h // 2) + i + 1, (w // 2) - (g_w // 2), "║")
         stdscr.addstr((h // 2) - (g_h // 2) + i + 1, (w // 2) + ((g_w // 2) - 1), "║")
     stdscr.addstr((h // 2) + (g_h // 2) - 1, (w // 2) - (g_w // 2), f"╚{line}╝")
+
+def random_item(stdscr, h, w, g_h, g_w, player, store):
+    prize = ["money"]
+    for item in store.items:
+        prize.append(item["name"])
+    selection = random.randint(0, len(prize) - 1)
+    prize_money = 0
+    if prize[selection] != "money":
+        player.bag.append(prize[selection])
+        stdscr.addstr((h // 2) - (g_h // 2) + 19, (w // 2) - (g_w // 2) + 5, f"You found a {prize[selection]}!")
+    else:
+        prize_money = random.randint(1, 5) * 10
+        player.money += prize_money
+        stdscr.addstr((h // 2) - (g_h // 2) + 19, (w // 2) - (g_w // 2) + 5, f"You found ${prize_money}!")
+    refresh_sleep(stdscr, 2)
+    stdscr.addstr((h // 2) - (g_h // 2) + 19, (w // 2) - (g_w // 2) + 3, f"{' ' * 70}")
+    stdscr.refresh()

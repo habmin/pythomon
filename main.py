@@ -3,7 +3,7 @@ import random
 
 from classes import *
 
-def grid_maker(height, width, encounter_rate, store_row, store_col, player_x, player_y):
+def grid_maker(height, width, encounter_rate, item_rate, store_row, store_col, player_x, player_y):
     # Create height by width grid and fill with Squares/Terrain
     grid = [[Square("grass") for i in range(width)] for j in range(height)]
 
@@ -25,6 +25,17 @@ def grid_maker(height, width, encounter_rate, store_row, store_col, player_x, pl
             random_row = random.randint(0, height - 1)
             random_col = random.randint(0, width - 1)
         grid[random_row][random_col].terrain = "encounter"
+
+    # Make remainder item locations
+    if item_rate:
+        for i in range(item_rate):
+            random_row = random.randint(0, height - 1)
+            random_col = random.randint(0, width - 1)
+            # Ensures placement is on unused terrain and not where player is located
+            while grid[random_row][random_col].terrain != "grass" or grid[random_row][random_col].player_occupied == True:
+                random_row = random.randint(0, height - 1)
+                random_col = random.randint(0, width - 1)
+            grid[random_row][random_col].terrain = "item"
 
     return grid
 
@@ -52,6 +63,7 @@ def game_start(stdscr):
     grid_height = 15
     grid_width = 15
     encounter_rate = 22
+    item_rate = 5
 
     # Main loop, always run until user quits via pressing 'q'
     # after starting game and creating a player
@@ -79,7 +91,7 @@ def game_start(stdscr):
                 store_col = random.randint(0, grid_width - 1)
             
             # Create grid
-            grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
+            grid = grid_maker(grid_height, grid_width, encounter_rate, item_rate, store_row, store_col, player_x, player_y)
             
             # Grid-movement loop
             # Breaks when lost a battle and after battle with trianer
@@ -97,7 +109,7 @@ def game_start(stdscr):
                     if encounter(stdscr, height, width, game_height, game_width, player, encounter_pythomon, "Wild"):
                         break
                     # Respawns new encounter locations
-                    grid = grid_maker(grid_height, grid_width, encounter_rate, store_row, store_col, player_x, player_y)
+                    grid = grid_maker(grid_height, grid_width, encounter_rate, item_rate, store_row, store_col, player_x, player_y)
                     stdscr.clear()
                 
                 elif grid[player_y][player_x].terrain == "store":
@@ -109,9 +121,16 @@ def game_start(stdscr):
                     stdscr.clear()
                     break
 
-                # Prints grid if player lands on grass
+                # Prints grid if player lands on grass or item
                 print_box(stdscr, height, width, game_height, game_width)
                 print_grid(stdscr, height, width, game_height, game_width, grid, player)
+
+                if grid[player_y][player_x].terrain == "item":
+                    item_rate -= 1
+                    random_item(stdscr, height, width, game_height, game_width, player, store)
+                    grid[player_y][player_x].terrain = "grass"
+                    #print_box(stdscr, height, width, game_height, game_width)
+                    print_grid(stdscr, height, width, game_height, game_width, grid, player)
 
                 # Keyboard listeners and handlers
                 keypress = stdscr.getch()
